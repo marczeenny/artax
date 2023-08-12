@@ -1,0 +1,139 @@
+{% extends "artax/layout.html" %}
+{% block title %}New File{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>New File</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'index' %}"></a>Dashboard</li>
+                <li class="breadcrumb-item active"><a href="{% url 'all_files' %}">Files</a></li>
+                <li class="breadcrumb-item active"><a href="{% url 'new_file' %}">New File</a></li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-9">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">New File Form</h5>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-exclamation-octagon me-1"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <!--TODO Book ID-->
+                        <!-- Floating Labels Form -->
+                        <form class="row g-3" method="post" action="{% url 'new_file' %}">
+                            {% csrf_token %}
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="ID" value="{{ file_id }}" disabled
+                                           name="ID">
+                                    <label for="ID">File ID</label>
+                                </div>
+                            </div>
+                            <!--TODO Book Type-->
+<!--                            <div class="col-md-6">-->
+<!--                                <div class="form-floating">-->
+<!--                                    <select class="form-select" id="bookType" aria-label="State" name="bookType">-->
+<!--                                        <option value="No specific type" name="bookType" selected>No specific type-->
+<!--                                        </option>-->
+<!--                                        {% for i in types %}-->
+<!--                                        <option value="{{ i }}" name="bookType">{{ i }}</option>-->
+<!--                                        {% endfor %}-->
+<!--                                    </select>-->
+<!--                                    <label for="bookType">Type</label>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="section" name="sections"
+                                           placeholder="Section">
+                                    <label for="section">Nbr of Sections</label>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-floating">
+                                    <select class="form-select" id="location" name="location" aria-label="State">
+                                        {% for loc in locations %}
+                                        <option value="{{ loc.id }}" id="loc" name="bookLocation">{{ loc }}</option>
+
+                                        {% endfor %}
+                                    </select>
+                                    <label for="location">Location</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <select class="form-select" id="client" name="client" aria-label="client">
+                                        {% for clt in clients %}
+                                        <option value="{{ clt.id }}" name="client">{{ clt.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="client">Client</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="opponent" name="opponent"
+                                           placeholder="Opponent">
+                                    <label for="opponent">Opponent</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Subject" id="subject" name="subject"
+                                              style="height: 150px;"></textarea>
+                                    <label for="subject">Subject</label>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form><!-- End floating Labels Form -->
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="card">
+                        <img style="cursor: pointer" id="qr-code-img" src="{% url 'generate_qr_code' url_arg %}" alt="QR Code" onclick="window.location = '{% url 'generate_qr_code' url_arg %}'">
+<!--                             onclick="window.location = '{# url 'generate_qr_code' book_id=book.id #}'"-->
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Book QR Code</h5>
+                            <p class="card-text text-center">Valid after submission of record.</p>
+                            <p class="card-text text-center" id="HELLO"><a href="{% url 'download_qr_code' url_arg %}" class="btn btn-outline-secondary" style="margin-bottom:10px;">Download QR Code</a></p>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $(".dropdown-menu li").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+
+</script>
+{% endblock %}

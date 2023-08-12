@@ -1,0 +1,36 @@
+{% macro nav_link(link, text, icon) %}
+    {% if request.endpoint.endswith(link) %}
+        <li class="nav-item">
+            <a class="nav-link" href=" {{ url_for(link) }}">
+                <i class="bi bi-{{icon}}"></i>
+                <span>{{text}}</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item collapsed">
+            <a class="nav-link collapsed" href=" {{ url_for(link) }}">
+                <i class="bi bi-{{icon}}"></i>
+                <span>{{text}}</span>
+            </a>
+        </li>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint) %}
+    <div class=page-items>
+      {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
+    </div>
+    <div class=pagination>
+      {% for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+          {% else %}
+            <strong>{{ page }}</strong>
+          {% endif %}
+        {% else %}
+          <span class=ellipsis>…</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endmacro %}

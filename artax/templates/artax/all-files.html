@@ -1,0 +1,78 @@
+{% extends 'artax/layout.html' %}
+{% block title %}Files{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>File System</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Dashboard</li>
+          <li class="breadcrumb-item active">Files</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Files</h5>
+              <div class="table-responsive-sm table-responsive-md">
+                <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Client Name <a type="button" class="btn btn-sm" style="padding: 0px 0px;" href="?order_by=title&asc=True"><i class="bi bi-sort-alpha-down"></i></a>
+                    <a type="button" class="btn btn-sm" style="padding: 0px 0px;" href="?order_by=title&asc=False"><i class="bi bi-sort-alpha-down-alt"></i></a></th>
+                    <th scope="col">Opponent</th>
+                    <th scope="col">No of Sections</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Registration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for file in page_obj %}
+                  <tr class="clickable " onclick="window.location='{% url 'show_file' file_id=file.id %}'" style="cursor: pointer;">
+                    <th scope="row">{{ file.id }}</th>
+                    <td>{{file.client.name}}</td>
+                    <td>{{file.opponent}}</td>
+                    <td>{{file.sections}}</td>
+                    <td>{{file.location.code}}</td>
+                    <td>{{ file.date_of_registration }}</td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-lg-9"></div>
+        <div class="col-lg-3">
+            <nav aria-label="Page navigation example float-right">
+                <ul class="pagination">
+                  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                      <li class="page-item"><a class="page-link">{{ num }}</a></li>
+                    {% else %}
+                      <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+                </ul>
+              </nav>
+          </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "artax/layout.html" %}
+{% load static %}
+{% block title %}Email Confirmed{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+  <main>
+    <div class="container">
+
+      <section class="section email-confirmed min-vh-100 d-flex flex-column align-items-center justify-content-center">
+        <h1>Email verified!</h1>
+        <h2>Now log in to unlock all of Artax's functionalities.</h2>
+        <a class="btn" href="{% url 'login' %}">Login</a>
+        <img src="{% static 'artax/img/png/logo.png' %}" class="img-fluid py-5" alt="">
+        <div class="credits">
+
+        </div>
+      </section>
+
+    </div>
+  </main><!-- End #main -->
+
+{% endblock %}

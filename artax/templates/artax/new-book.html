@@ -1,0 +1,183 @@
+{% extends "artax/layout.html" %}
+{% block title %}New Book{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-octagon me-1"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="pagetitle">
+        <h1>New Book</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'index' %}"></a>Dashboard</li>
+                <li class="breadcrumb-item active"><a href="{% url 'all_books' %}">Books</a></li>
+                <li class="breadcrumb-item active">New Book</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-9">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">New Book Form</h5>
+                        <!--TODO Book ID-->
+                        <!-- Floating Labels Form -->
+                        <form class="row g-3" method="post" action="{% url 'new_book' %}">
+                            {% csrf_token %}
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="bookID" value="{{book_id}}" disabled
+                                           name="bookID">
+                                    <label for="bookID">Book ID</label>
+                                </div>
+                            </div>
+                            <!--TODO Book Type-->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="bookType" aria-label="State" name="bookType">
+                                        {% for i in types %}
+                                        <option value="{{ i.id }}" name="bookType">{{ i.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="bookType">Type</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="specialID" value="ABC123" disabled
+                                           name="specialID">
+                                    <label for="specialID">Special ID</label>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="bookTitle" placeholder="Book's Name"
+                                           name="bookTitle">
+                                    <label for="bookTitle">Book's Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="section" name="bookSection"
+                                           placeholder="Section">
+                                    <label for="section">Sections</label>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-floating">
+                                    <select class="form-select" id="authorName" name="authorName" aria-label="State">
+                                        {% for auth in authors %}
+                                        <option value="{{ auth.id }}" name="authorName">{{ auth }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="authorName">Author's Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="numberOfCopies"
+                                           placeholder="Number Of Copies" name="numberOfCopies" min="1" value="1">
+                                    <label for="numberOfCopies">Nbr of copies</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Address" id="subject" name="subject"
+                                              style="height: 100px;"></textarea>
+                                    <label for="subject">Subject</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="publisher" name="publisher"
+                                           placeholder="Publisher">
+                                    <label for="publisher">Publisher</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="location" name="bookLocation" aria-label="State">
+                                        {% for loc in locations %}
+                                        <option value="{{ loc.id }}" name="bookLocation">{{ loc.code }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="location">Location</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="language" name="bookLanguage" aria-label="Language">
+                                        {% for lang in languages %}
+                                        <option value="{{ lang.id }}" name="bookLanguage">{{ lang.code }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="language">Language</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="publishingYear" name="publishingYear"
+                                           placeholder="Publishing Year">
+                                    <label for="publishingYear">Publishing Year</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="purchaseDate" name="purchaseDate"
+                                           placeholder="Purchase Date">
+                                    <label for="purchaseDate">Purchase Date</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="ISBN" name="isbn" placeholder="ISBN"
+                                           min="1" max="9999999999999">
+                                    <label for="ISBN">ISBN</label>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form><!-- End floating Labels Form -->
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card">
+                        <img style="cursor: pointer" id="qr-code-img" src="{% url 'generate_qr_code' url_arg %}" alt="QR Code" onclick="window.location = '{% url 'generate_qr_code' url_arg %}'">
+<!--                             onclick="window.location = '{# url 'generate_qr_code' book_id=book.id #}'"-->
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Book QR Code</h5>
+                            <p class="card-text text-center">Valid used after submission of record.</p>
+                            <p class="card-text text-center" id="HELLO"><a href="{% url 'download_qr_code' url_arg %}" class="btn btn-outline-secondary" style="margin-bottom:10px;">Download QR Code</a></p>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $(".dropdown-menu li").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "artax/layout.html" %}
+{% block title %}Contact Us{% endblock %}
+{% block content %}
+
+<main class="main" id="main">
+    <div class="pagetitle"><h1>Contact</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                <li class="breadcrumb-item active">Contact</li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section contact">
+        <div class="row gy-4">
+            <div class="col-xl-6">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="info-box card"><i class="bi bi-geo-alt"></i>
+                            <h3>Address</h3>
+                            <p>Building under Antelias-Nakkash Bridge, near AGBU school<br>Nakkash, Antelias</p></div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="info-box card"><i class="bi bi-telephone"></i>
+                            <h3>Call Us</h3>
+                            <p><a href="tel:0096104444824">+961 04 444 824</a><br><a href="tel:0096104444814">+961 04 444 814</a></p></div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="info-box card"><i class="bi bi-envelope"></i>
+                            <h3>Email Us</h3>
+                            <p><a class="__cf_email__" data-cfemail="86efe8e0e9c6e3fee7ebf6eae3a8e5e9eb"
+                                  href="mailto:info@zeennylawfirm.com">info@zeennylawfirm.com</a><br>
+                            <p style="color:white;">.</p>
+                            </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="info-box card"><i class="bi bi-clock"></i>
+                            <h3>Open Hours</h3>
+                            <p>Monday - Friday<br>9:00AM - 05:00PM</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card p-4">
+                    <iframe allowfullscreen=""
+                            frameborder="0" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1894.191315208335!2d35.5871772945248!3d33.92303509486296!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2slb!4v1671286671174!5m2!1sen!2slb" style="border:0; width: 100%; height: 400px;"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

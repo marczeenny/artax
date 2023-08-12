@@ -1,0 +1,199 @@
+{% load custom_tags %}
+{% load static %}
+<!--<!DOCTYPE html>-->
+<html lang="en">
+<head>
+
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{% static 'artax/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'artax/img/apple-touch-icon.png'" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Matters -->
+    <link href="{% static 'artax/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/quill/quill.snow.css'%}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/quill/quill.bubble.css'%}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/remixicon/remixicon.css'%}" rel="stylesheet">
+    <link href="{% static 'artax/vendor/simple-datatables/style.css'%}" rel="stylesheet">
+
+
+    <!-- Template Main CSS File -->
+    <link href="{% static 'artax/css/style.css'%}" rel="stylesheet">
+
+
+    {% endblock %}
+
+</head>
+<body>
+
+{% block header %}
+<header id="header" class="header fixed-top d-flex align-items-center">
+
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'index' %}" class="logo d-flex align-items-center" >
+            <img src="{% static 'artax/img/png/logo.png' %}" style="height: 40px;" alt="">&nbsp;&nbsp;
+            <span class="d-none d-lg-block">Artax 1.0</span>
+        </a>
+        <i class="bi bi-list toggle-sidebar-btn "></i>
+    </div><!-- End Logo -->
+
+
+    <nav class="header-nav ms-auto">
+        <ul class="d-flex align-items-center">
+
+
+            <li class="nav-item dropdown">
+
+
+            </li><!-- End Notification Nav -->
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown pe-3">
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.get_full_name }}</span>
+                </a><!-- End Profile Image Icon -->
+
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <li class="dropdown-header">
+                        <h6>{{ user.get_full_name }} </h6>
+                        <span>{{ user.job }}</span>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{% url 'profile' %}">
+                            <i class="bi bi-person"></i>
+                            <span>My Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{% url 'profile' %}"
+                           data-bs-target="#profile-edit">
+                            <i class="bi bi-gear"></i>
+                            <span>Account Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{% url 'faq' %}">
+                            <i class="bi bi-question-circle"></i>
+                            <span>Need Help?</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </li>
+
+                </ul><!-- End Profile Dropdown Items -->
+            </li><!-- End Profile Nav -->
+            {% else %}
+            <li class="nav-item pe-4">
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'login' %}">
+                    <span class="d-none d-md-block ps-2">Login to access Artax&trade; features&nbsp;<i class="bi bi-box-arrow-in-right"></i></span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav><!-- End Icons Navigation -->
+
+</header><!-- End Header -->
+{% endblock %}
+{% block sidebar %}
+<aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav collapsed" id="sidebar-nav">
+
+        {% nav_link 'index' 'Dashboard ' 'grid' %}<!-- End Dashboard Nav -->
+
+        <li class="nav-heading">Clients</li>
+        {% nav_link 'all_clients' 'Clients' 'people' %}
+        {% nav_link 'new_client' 'New Client' 'person-plus' %}
+        {% nav_link 'index' 'Query Clients' 'search' %}
+
+        <li class="nav-heading">Books</li>
+        {% nav_link 'all_books' 'Books' 'journal-bookmark' %}
+        {% nav_link 'new_book' 'New Book' 'journal-plus' %}
+        {% nav_link 'book_queries' 'Query Books ' 'search' %}
+
+        <li class="nav-heading">Files</li>
+        {% nav_link 'all_files' 'Files ' 'file-earmark-text' %}
+        {% nav_link 'new_file' 'New File' 'file-earmark-plus' %}
+        {% nav_link 'file_queries' 'Query Files ' 'search' %}
+
+        <li class="nav-heading">Users</li>
+        <!-- End Profile Page Nav -->
+
+        {% nav_link 'faq' 'F.A.Q' 'question-circle'%}
+        {% nav_link 'contact' 'Contact' 'envelope' %}
+        {% if user.is_staff %}
+            {% nav_link 'register' 'Register' 'person-plus' %}
+        {% endif %}
+        {% if user.is_authenticated %}
+            {% nav_link 'profile' 'Profile ' 'file-person' %}
+            {% nav_link 'logout' 'Logout' 'box-arrow-right' %}
+        {% endif %}
+
+        {% nav_link 'blank' 'Blank Page' 'file-earmark-arrow-up' %}<!-- End Blank Page Nav -->
+
+    </ul>
+
+</aside><!-- End Sidebar-->
+{% endblock%}
+{% block content %}{% endblock %}
+{% block footer %}
+<footer id="footer" class="footer">
+    <div class="copyright">
+        &copy; Copyright <strong><span>ARTAX</span></strong>. All Rights Reserved
+    </div>
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Matters -->
+
+<script src="{% static 'artax/vendor/apexcharts/apexcharts.min.js' %}"></script>
+<script src="{% static 'artax/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'artax/vendor/chart.js/chart.min.js' %}"></script>
+<script src="{% static 'artax/vendor/echarts/echarts.min.js' %}"></script>
+<script src="{% static 'artax/vendor/quill/quill.min.js' %}"></script>
+<script src="{% static 'artax/vendor/simple-datatables/simple-datatables.js' %}"></script>
+<script src="{% static 'artax/vendor/tinymce/tinymce.min.js' %}"></script>
+<script src="{% static 'artax/vendor/php-email-form/validate.js' %}"></script>
+
+<!-- Template Main JS File -->
+<script src="{% static 'artax/js/main.js' %}"></script>
+
+<div class="loading-animation"></div>
+</body>
+</html>
+{% endblock %}

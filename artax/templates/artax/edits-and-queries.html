@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+{% block title %}New Book{% endblock %}
+{% block content %}
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Query</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Dashboard</li>
+          <li class="breadcrumb-item active">Books</li>
+          <li class="breadcrumb-item active">Query</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Query</h5>
+               {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        {% for message in messages %}
+                          <p>{{ message }}</p>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+              <!--TODO Book ID-->
+              <!-- Floating Labels Form -->
+              <form class="row g-3" method="post" action="{{ url_for('query') }}">
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="bookID" value="{{book_id}}" disabled name="bookID">
+                    <label for="bookID">Book ID</label>
+                  </div>
+                </div>
+                <!--TODO Book Type-->
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <select class="form-select" id="bookType" aria-label="State"  name="bookType">
+                      <option value="No specific type" name="bookType" selected>No specific type</option>
+                      {% for i in types: %}
+                      <option value="{{ i }}" name="bookType">{{ i }}</option>
+                      {% endfor %}
+                    </select>
+                    <label for="bookType">Type</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" id="numberOfCopies" placeholder="Number Of Copies" name="numberOfCopies">
+                    <label for="numberOfCopies">Number Of Copies</label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="bookTitle" placeholder="Book's Name" name="bookTitle">
+                    <label for="bookTitle">Book's Name</label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <select class="form-select" id="authorName" name="authorName" aria-label="State">
+                      {% for auth in authors: %}
+                      <option value="{{ auth }}" name="authorName">{{ auth }}</option>
+                      {% endfor %}
+                    </select>
+                    <label for="authorName">Author's Name</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-floating">
+                    <textarea class="form-control" placeholder="Address" id="subject" name="subject" style="height: 100px;"></textarea>
+                    <label for="subject">Subject</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="bookLocation" name="bookLocation" placeholder="Location">
+                    <label for="bookLocation">Location</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" id="section" name="bookSection" placeholder="Section">
+                    <label for="section">Section</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="publisher" name="publisher" placeholder="Publisher">
+                    <label for="publisher">Publisher</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="publishingDate" name="publishingDate" placeholder="Publishing Date">
+                    <label for="publishingDate">Publishing Date</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" id="ISBN" name="isbn" placeholder="ISBN">
+                    <label for="ISBN">ISBN</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="purchaseDate" name="purchaseDate" placeholder="Purchase Date">
+                    <label for="purchaseDate">Purchase Date</label>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form><!-- End floating Labels Form -->
+
+            </div>
+          </div>
+        </div>
+      <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Floating labels Form</h5>
+
+              <!-- Floating Labels Form -->
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

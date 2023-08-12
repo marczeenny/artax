@@ -1,0 +1,119 @@
+{% extends 'artax/layout.html' %}
+{% block title %}Query | Files{% endblock %}
+{% block content %}
+
+ <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Query Matters</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="">Home</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'all_books' %}">Files</a></li>
+          <li class="breadcrumb-item active"><a href="{% url 'file_queries' %}">Query</a></li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Query by ID</h5>
+              <form action="{% url 'query_files_by' %}" method="post">
+                {% csrf_token %}
+                <div class="row mb-3 form-floating">
+                  <label for="ID" class="col-sm-2 col-form-label">ID</label>
+                  <div class=" input-group">
+                    <span class="input-group-text" id="inputGroupPrepend">#</span>
+                    <input type="number" class="form-control" id="ID" placeholder="ID" min="1" value="1" name="name">
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Query by Client</h5>
+              <form action="{% url 'query_files_by'%} ?book_query_param=client" method="post">
+                {% csrf_token %}
+                <div class="form-floating">
+                    <select class="form-select" id="client" aria-label="Client"  name="name">
+                      {% for i in clients %}
+                      <option value="{{ i.id }}" name="name">{{ i.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <label for="client">Client</label>
+                </div>
+                <br>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Query by Subject</h5>
+                <form action="{% url 'query_files_by' %}?file_query_param=subject" method="post">
+                  {% csrf_token %}
+                  <div class="form-floating">
+                    <textarea class="form-control" id="subject" placeholder="Subject" name="name" style="height:100px;"></textarea>
+                    <label for="subject">Subject</label>
+                  </div>
+                  <br>
+                  <div class="text-center">
+                  <button type="submit" class="btn btn-primary" >Submit</button>
+                </div>
+                </form>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Query by Location</h5>
+              <form action="{% url 'query_files_by' %}?book_query_param=location" method="post">
+                {% csrf_token %}
+                <div class="form-floating">
+                    <select class="form-select" id="fileLocation" aria-label="State"  name="name">
+                      {% for loc in locations %}
+                      <option value="{{ loc.id }}" name="name">{{ loc.code }}</option>
+                      {% endfor %}
+                    </select>
+                    <label for="fileLocation">Location</label>
+                </div>
+                <br>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary" >Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+  </main><!-- End #main -->
+{% endblock %}
