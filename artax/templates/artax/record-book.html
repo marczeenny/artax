@@ -237,15 +237,15 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <label for="purchase_date" class="col-md-4 col-lg-3 col-form-label">Purchase
-                                            Date</label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="purchase_date" type="text" class="form-control"
-                                                   id="purchase_date"
-                                                   value="{{ book.purchase_date }}">
-                                        </div>
-                                    </div>
+<!--                                    <div class="row mb-3">-->
+<!--                                        <label for="purchase_date" class="col-md-4 col-lg-3 col-form-label">Purchase-->
+<!--                                            Date</label>-->
+<!--                                        <div class="col-md-8 col-lg-9">-->
+<!--                                            <input name="purchase_date" type="text" class="form-control"-->
+<!--                                                   id="purchase_date"-->
+<!--                                                   value="{{ book.purchase_date }}">-->
+<!--                                        </div>-->
+<!--                                    </div>-->
 
                                     <div class="row mb-3">
                                         <label for="isbn" class="col-md-4 col-lg-3 col-form-label">ISBN</label>
@@ -256,7 +256,7 @@
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" id="submitButton" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form><!-- End Profile Edit Form -->
 
@@ -326,6 +326,5 @@
             </div>
         </div>
     </section>
-
 </main><!-- End #main -->
 {% endblock %}

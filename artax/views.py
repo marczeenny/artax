@@ -300,9 +300,6 @@ def query_books_by(request):
         context = {'param': "book"}
         return render(request, "artax/record-404.html", context)
     else:
-        # page_number = request.GET.get('page')
-        # books_pag = books if request.GET.get("asc") == 'True' else books.order_by("-pk")
-        # paginator = Paginator(books_pag, PER_PAGE)
         page_obj = books
         return render(request, "artax/all-books.html", {"page_obj": page_obj})
 
@@ -323,7 +320,7 @@ def show_book(request, book_id):
         book_record.language = book_language
         book_record.publisher = request.POST.get("publisher")
         book_record.publishing_date = request.POST.get("publishing_date")
-        book_record.purchase_date = request.POST.get("purchase_date")
+        # book_record.purchase_date = request.POST.get("purchase_date")
         book_record.isbn = request.POST.get("isbn")
         book_record.number_of_copies = request.POST.get("numberOfCopies")
         print(RED + request.POST.get("numberOfCopies") + RESET)
