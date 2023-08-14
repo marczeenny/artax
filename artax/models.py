@@ -3,7 +3,17 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 from phonenumber_field.modelfields import PhoneNumberField
 
-# Create your models here.
+
+def custom_summary_filename(instance, filename):
+    book_id = Book.objects.all().last().pk
+    filename = f"{book_id + 1}-summary.pdf"
+    return f"summaries/{filename}"
+
+
+def custom_cover_filename(instance, filename):
+    book_id = Book.objects.all().last().pk
+    filename = f"{book_id + 1}-cover.pdf"
+    return f"cover/{filename}"
 
 
 class User(AbstractUser):
@@ -32,6 +42,7 @@ class Book(models.Model):
     publisher = models.CharField(max_length=250)
     publishing_date = models.CharField(max_length=250, null=True)
     purchase_date = models.DateField(null=True)
+    summary = models.FileField(upload_to=custom_summary_filename, blank=True, null=True)
     isbn = models.IntegerField(null=True)
     number_of_copies = models.IntegerField()
     language = models.ForeignKey("Language", models.SET_NULL, related_name="book", null=True)

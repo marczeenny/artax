@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -13,6 +15,7 @@ urlpatterns = [
     path("change-password/", views.change_password, name="change_password"),
     path("logout/", views.logout_view, name="logout"),
     path("books/new-book/", views.new_book, name="new_book"),
+    path('view-summary/<int:book_id>/', views.view_book_summary, name='view_book_summary'),
     path("books/queries/", views.book_queries, name="book_queries"),
     path("books/", views.all_books, name="all_books"),
     path("books/query-by/", views.query_books_by, name="query_books_by"),
@@ -29,3 +32,6 @@ urlpatterns = [
     path("clients/", views.all_clients, name="all_clients"),
     path("clients/new-client/", views.new_client, name="new_client"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

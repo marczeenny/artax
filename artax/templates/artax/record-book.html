@@ -37,6 +37,11 @@
                             </li>
 
                             <li class="nav-item">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#summary">View Summary
+                                </button>
+                            </li>
+
+                            <li class="nav-item">
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delete-record">Delete
                                     Record
                                 </button>
@@ -259,6 +264,13 @@
                                         <button type="submit" id="submitButton" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form><!-- End Profile Edit Form -->
+
+                            </div>
+
+<!-- TODO ############################################# Summary #####################################################-->
+                            <div class="tab-pane fade profile-edit pt-3" id="summary">
+                                <a class=" secondary mb-3" target="_blank" href="{% url 'view_book_summary' book_id=book.id %}">Open in a new window</a>
+                                <iframe src="{% url 'view_book_summary' book_id=book.id %}" width="100%" height="700"></iframe>
 
                             </div>
 

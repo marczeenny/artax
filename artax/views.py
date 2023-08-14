@@ -220,38 +220,47 @@ def all_books(request):
     return render(request, "artax/all-books.html", {"page_obj": page_obj})
 
 
+def view_book_summary(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    response = HttpResponse(book.summary, content_type='application/pdf')
+    return response
+
+
 @login_required(login_url="login")
 def new_book(request):
-    book_id = Book.objects.all().last()
-    if book_id is None:
+    book_record = Book.objects.all().last()
+    if book_record is None:
         book_id = 1
     else:
-        book_id = book_id.id + 1
+        book_id = book_record.id + 1
     types, authors, locations, languages = Type.objects.all(), Author.objects.all(), Location.objects.all(), Language.objects.all()
     if request.method == "POST":
         if Book.objects.filter(title=request.POST.get("bookTitle")).first():
-            messages.warning("A book already exists with that title. Choose another one and try again.")
+            messages.warning(request, "A book already exists with that title. Choose another one and try again.")
             return redirect('new_book')
         else:
             book_type = Type.objects.get(pk=request.POST.get("bookType"))
             special_id = f"{book_type.code}{Book.objects.filter(type=book_type).count() + 1}"
-            new_book = Book(
+            new_book_record = Book(
                 lib_id=special_id,
                 author=Author.objects.get(pk=request.POST.get("authorName")),
                 title=request.POST.get("bookTitle"),
                 subject=request.POST.get("subject"),
                 type=Type.objects.get(pk=request.POST.get("bookType")),
                 section=request.POST.get("bookSection"),
-                locations=Location.objects.get(pk=request.POST.get("bookLocation")),
+                location=Location.objects.get(pk=request.POST.get("bookLocation")),
                 language=Language.objects.get(pk=request.POST.get("bookLanguage")),
+                summary=request.FILES["bookSummary"],
                 publisher=request.POST.get("publisher"),
                 publishing_date=request.POST.get("publishingYear"),
                 purchase_date=request.POST.get("purchaseDate"),
                 isbn=request.POST.get("isbn"),
-                number_of_copies=request.POST.get("numberOfCopies")
+                number_of_copies=request.POST.get("numberOfCopies"),
+                registrator=request.user,
             )
-            print(new_book.author, new_book.title, new_book.subject, new_book.type, new_book.section, new_book.location)
-            new_book.save()
+            print(new_book_record.author, new_book_record.title, new_book_record.subject, new_book_record.type,
+                  new_book_record.section, new_book_record.location)
+            new_book_record.save()
         return redirect("show_book", book_id=book_id)
     return render(request, "artax/new-book.html", {"book_id": book_id, "types": types, "locations": locations,
                                                    "authors": authors, "languages": languages, "url_arg": f"books%2F{book_id}%2F"})
