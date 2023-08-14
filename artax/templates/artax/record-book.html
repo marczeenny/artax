@@ -67,6 +67,11 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-lg-3 col-md-4 label ">Special ID</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.lib_id }}</div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-lg-3 col-md-4 label ">Title</div>
                                     <div class="col-lg-9 col-md-8">{{ book.title }}</div>
                                 </div>
@@ -110,15 +115,29 @@
                                     <div class="col-lg-9 col-md-8">{{ book.purchase_date }}</div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-lg-3 col-md-4 label">ISBN</div>
-                                    <div class="col-lg-9 col-md-8">{{ book.isbn }}</div>
-                                </div>
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Nbr of Copies</div>
                                     <div class="col-lg-9 col-md-8">{{ book.number_of_copies }}</div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">ISBN</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.isbn }}</div>
+                                </div>
+
+                                <h5 class="card-title">Registration Details</h5>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Registrator</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.registrator.get_full_name }}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Registration Date</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.date_of_registration }}</div>
+                                </div>
+
 
                             </div>
 
