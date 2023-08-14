@@ -118,7 +118,7 @@
                                 <div class="form-floating">
                                     <select class="form-select" id="language" name="bookLanguage" aria-label="Language">
                                         {% for lang in languages %}
-                                        <option value="{{ lang.id }}" name="bookLanguage">{{ lang.code }}</option>
+                                        <option value="{{ lang.id }}" name="bookLanguage">{{ lang.name }}</option>
                                         {% endfor %}
                                     </select>
                                     <label for="language">Language</label>
