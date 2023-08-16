@@ -32,7 +32,7 @@
                         <h5 class="card-title">New Book Form</h5>
                         <!--TODO Book ID-->
                         <!-- Floating Labels Form -->
-                        <form class="row g-3" method="post" action="{% url 'new_book' %}" enctype="multipart/form-data">
+                        <form class="row g-3 " method="post" action="{% url 'new_book' %}" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
                             <div class="col-md-3">
                                 <div class="form-floating">
@@ -44,7 +44,8 @@
                             <!--TODO Book Type-->
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <select class="form-select" id="bookType" aria-label="State" name="bookType">
+                                    <select class="form-select" id="bookType" aria-label="Type" name="bookType">
+                                        <option value="0">Select a book type</option>
                                         {% for i in types %}
                                         <option value="{{ i.id }}" name="bookType">{{ i.name }}</option>
                                         {% endfor %}
@@ -62,7 +63,7 @@
                             <div class="col-md-9">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="bookTitle" placeholder="Book's Name"
-                                           name="bookTitle">
+                                           name="bookTitle" required>
                                     <label for="bookTitle">Book's Name</label>
                                 </div>
                             </div>
@@ -75,7 +76,8 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="form-floating">
-                                    <select class="form-select" id="authorName" name="authorName" aria-label="State">
+                                    <select class="form-select" id="authorName" name="authorName" aria-label="Author">
+                                        <option value="0">Select an author</option>
                                         {% for auth in authors %}
                                         <option value="{{ auth.id }}" name="authorName">{{ auth }}</option>
                                         {% endfor %}
@@ -100,13 +102,14 @@
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="publisher" name="publisher"
-                                           placeholder="Publisher">
+                                           placeholder="Publisher" required>
                                     <label for="publisher">Publisher</label>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="location" name="bookLocation" aria-label="State">
+                                        <option value="0">Select a location</option>
                                         {% for loc in locations %}
                                         <option value="{{ loc.id }}" name="bookLocation">{{ loc.code }}</option>
                                         {% endfor %}
@@ -117,6 +120,7 @@
                             <div class="col-md-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="language" name="bookLanguage" aria-label="Language">
+                                        <option value="0">Select a language</option>
                                         {% for lang in languages %}
                                         <option value="{{ lang.id }}" name="bookLanguage">{{ lang.name }}</option>
                                         {% endfor %}

@@ -48,7 +48,9 @@ class Book(models.Model):
     number_of_copies = models.IntegerField()
     language = models.ForeignKey("Language", models.SET_NULL, related_name="book", null=True)
     date_of_registration = models.DateField(default=datetime.today)
-    registrator = models.ForeignKey(User, models.SET_NULL, null=True)
+    registrator = models.ForeignKey(User, models.SET_NULL, null=True, related_name="book_registrator")
+    last_editor = models.ForeignKey(User, models.SET_NULL, null=True, related_name="book_latest_editor")
+    last_edit_time = models.DateTimeField()
 
     def __str__(self):
         return f"{self.title} by {self.author}"

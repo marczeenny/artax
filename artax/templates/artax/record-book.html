@@ -157,6 +157,16 @@
                                     <div class="col-lg-9 col-md-8">{{ book.date_of_registration }}</div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Latest Editor</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.last_edit.get_full_name }}</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Latest Edit Time</div>
+                                    <div class="col-lg-9 col-md-8">{{ book.last_edit_time }}</div>
+                                </div>
+
 
                             </div>
 

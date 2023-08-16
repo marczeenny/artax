@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
@@ -6,7 +8,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from .models import User, Book, Client, File, Author, Type, Location, Language
 from django.core.paginator import Paginator
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib import messages
 import qrcode
 import qrcode.image.svg
@@ -275,23 +277,30 @@ def new_book(request):
                 lib_id=special_id,
                 author=Author.objects.get(pk=request.POST.get("authorName")),
                 title=request.POST.get("bookTitle"),
-                subject=request.POST.get("subject"),
+                subject=request.POST.get("subject", None),
                 type=Type.objects.get(pk=request.POST.get("bookType")),
-                section=request.POST.get("bookSection"),
+                section=request.POST.get("bookSection", None),
                 location=Location.objects.get(pk=request.POST.get("bookLocation")),
                 language=Language.objects.get(pk=request.POST.get("bookLanguage")),
                 summary=book_summary,
                 cover=book_cover,
                 publisher=request.POST.get("publisher"),
                 publishing_date=request.POST.get("publishingYear"),
-                purchase_date=request.POST.get("purchaseDate"),
-                isbn=request.POST.get("isbn"),
+                purchase_date=purchase_date,
+                isbn=isbn,
                 number_of_copies=request.POST.get("numberOfCopies"),
                 registrator=request.user,
+                last_editor=request.user,
+                last_edit_time=datetime.datetime.now(),
             )
-            print(new_book_record.author, new_book_record.title, new_book_record.subject, new_book_record.type,
-                  new_book_record.section, new_book_record.location)
-            new_book_record.save()
+            try:
+                new_book_record.save()
+            except ValueError as error:
+                messages.warning(request, f"{error}")
+                return redirect("new_book")
+            except ValidationError as error:
+                messages.warning(request, f"{error}")
+                return redirect("new_book")
         return redirect("show_book", book_id=book_id)
     return render(request, "artax/new-book.html", {"book_id": book_id, "types": types, "locations": locations,
                                                    "authors": authors, "languages": languages, "url_arg": f"books%2F{book_id}%2F"})
@@ -360,7 +369,8 @@ def show_book(request, book_id):
         book_record.language = book_language
         book_record.publisher = request.POST.get("publisher")
         book_record.publishing_date = request.POST.get("publishing_date")
-        # book_record.purchase_date = request.POST.get("purchase_date")
+        book_record.last_edit_time = datetime.datetime.now()
+        book_record.last_edit = request.user
         book_record.isbn = request.POST.get("isbn")
         book_record.number_of_copies = request.POST.get("numberOfCopies")
         print(RED + request.POST.get("numberOfCopies") + RESET)
