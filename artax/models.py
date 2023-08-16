@@ -12,7 +12,7 @@ def custom_summary_filename(instance, filename):
 
 def custom_cover_filename(instance, filename):
     book_id = Book.objects.all().last().pk
-    filename = f"{book_id + 1}-cover.pdf"
+    filename = f"{book_id + 1}-cover"
     return f"cover/{filename}"
 
 
@@ -43,6 +43,7 @@ class Book(models.Model):
     publishing_date = models.CharField(max_length=250, null=True)
     purchase_date = models.DateField(null=True)
     summary = models.FileField(upload_to=custom_summary_filename, blank=True, null=True)
+    cover = models.ImageField(upload_to=custom_cover_filename, blank=True, null=True)
     isbn = models.IntegerField(null=True)
     number_of_copies = models.IntegerField()
     language = models.ForeignKey("Language", models.SET_NULL, related_name="book", null=True)
