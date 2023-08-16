@@ -145,8 +145,11 @@
                                     <label for="ISBN">ISBN</label>
                                 </div>
                             </div>
-                            <div class="mb-3 col-md-12">
-                              <input class="form-control" name="bookSummary" type="file" id="formFileMultiple">
+                            <div class="mb-3 col-md-6">
+                              <input class="form-control" accept="application/pdf" name="bookSummary" type="file" id="formFileSummary">
+                            </div>
+                            <div class="mb-2 col-md-6">
+                                <input class="form-control" accept="image/jpg, image/jpeg, image/png" name="bookCover" type="file" id="formFileCover">
                             </div>
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -172,15 +175,49 @@
 
 </main><!-- End #main -->
 <script>
-$(document).ready(function(){
-  $("#myInput").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $(".dropdown-menu li").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-  });
-});
 
+
+const form = document.querySelector('form')
+let selectInputs = document.querySelectorAll("select");
+let inputs = document.querySelectorAll("input")
+
+
+// Loop over them and prevent submission
+form.addEventListener('submit', event => {
+    selectInputs.forEach(select => {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption.value === '0') {
+            console.log("HELLOO12333")
+            event.preventDefault()
+            event.stopPropagation()
+            select.classList.add("is-invalid")
+        }
+        if (select.classList.contains("is-invalid") && selectedOption.value !== '0') {
+            select.classList.remove("is-invalid")
+        }
+
+        })
+    inputs.forEach(input => {
+        const input_value = input.value.replace(/\\s+/g)
+        if (input_value === "" && input.required) {
+            input.classList.add("is-invalid")
+        }
+        if (input.classList.contains("is-invalid") && input_value !== "") {
+            input.classList.remove("is-invalid")
+        }
+    })
+    // alert("HELLO")
+    // alert(document.querySelectorAll("select option[value='0']"))
+    if (!form.checkValidity()) {
+        console.log("HELLOO")
+        event.preventDefault()
+        event.stopPropagation()
+        // alert("HELLP")
+
+    }
+
+    // form.classList.add('was-validated')
+}, false)
 
 </script>
 {% endblock %}

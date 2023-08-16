@@ -35,12 +35,12 @@
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#record-edit">Edit Record
                                 </button>
                             </li>
-
+                            {% if book.summary %}
                             <li class="nav-item">
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#summary">View Summary
                                 </button>
                             </li>
-
+                            {% endif %}
                             <li class="nav-item">
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delete-record">Delete
                                     Record
@@ -51,7 +51,16 @@
                         <div class="tab-content pt-2">
 <!-- TODO ############################## Info Read Only section ########################################### -->
                             <div class="tab-pane fade show active profile-overview" id="record-overview">
-                                <h5 class="card-title">Book Subject</h5>
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Book Subject</h5>
+                                    </div>
+                                    {% if book.cover %}
+                                    <div class="col-md-6 text-md-end">
+                                        <button class="btn btn-outline-primary" style="" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Book Cover</button>
+                                    </div>
+                                    {% endif %}
+                                </div>
                                 {% if messages %}
                                 {% for message in messages %}
                                 <p>{{ message }}</p>
@@ -60,6 +69,16 @@
                                 <p class="small fst-italic">{{ book.subject }}</p>
 
                                 <h5 class="card-title">Book Details</h5>
+
+                                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                                  <div class="offcanvas-header">
+                                    <h5 class="offcanvas-title" id="offcanvasRightLabel">Book Cover</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                  </div>
+                                  <div class="offcanvas-body">
+                                    <img src="{% url 'view_book_cover' book_id=book.id %}" width="100%"  class="mt-3" alt="Book Cover">
+                                  </div>
+                                </div>
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label ">ID</div>
@@ -287,11 +306,13 @@
                             </div>
 
 <!-- TODO ############################################# Summary #####################################################-->
+                            {% if book.summary %}
                             <div class="tab-pane fade profile-edit pt-3" id="summary">
-                                <a class=" secondary mb-3" target="_blank" href="{% url 'view_book_summary' book_id=book.id %}">Open in a new window</a>
-                                <iframe src="{% url 'view_book_summary' book_id=book.id %}" width="100%" height="700"></iframe>
-
+                                <a href="{% url 'view_book_summary' book_id=book.id %}" class="link-primary" target="_blank">Open in a new tab</a>
+                                <iframe src="{% url 'view_book_summary' book_id=book.id %}" width="100%" height="700" class="mt-3"></iframe>
                             </div>
+                            {% endif %}
+
 
                             <div class="tab-pane fade pt-3" id="delete-record">
                                 <!-- Change Password Form -->

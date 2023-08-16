@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -222,7 +222,19 @@ def all_books(request):
 
 def view_book_summary(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    response = HttpResponse(book.summary, content_type='application/pdf')
+    try:
+        response = HttpResponse(book.summary, content_type='application/pdf')
+    except ValueError:
+        raise Http404("Book summary not found.")
+    return response
+
+
+def view_book_cover(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    try:
+        response = HttpResponse(book.cover, content_type='application/jpeg')
+    except ValueError:
+        raise Http404("Book cover not found.")
     return response
 
 
@@ -241,6 +253,24 @@ def new_book(request):
         else:
             book_type = Type.objects.get(pk=request.POST.get("bookType"))
             special_id = f"{book_type.code}{Book.objects.filter(type=book_type).count() + 1}"
+
+            purchase_date = request.POST.get("purchaseDate")
+            isbn = request.POST.get("isbn")
+            if purchase_date == '':
+                purchase_date = None
+            if isbn == '':
+                isbn = None
+
+            book_summary = request.FILES.get("bookSummary")
+            book_cover = request.FILES.get("bookCover")
+
+            if book_summary.content_type != "application/pdf":
+                messages.warning(request, "File type for summary invalid.")
+                return redirect("new_book")
+            if book_cover.content_type != "image/png" or book_cover.content_type != "image/jpg" or book_cover.content_type != "image/jpeg":
+                messages.warning(request, "File type for image cover invalid.")
+                return redirect("new_book")
+
             new_book_record = Book(
                 lib_id=special_id,
                 author=Author.objects.get(pk=request.POST.get("authorName")),
@@ -250,7 +280,8 @@ def new_book(request):
                 section=request.POST.get("bookSection"),
                 location=Location.objects.get(pk=request.POST.get("bookLocation")),
                 language=Language.objects.get(pk=request.POST.get("bookLanguage")),
-                summary=request.FILES["bookSummary"],
+                summary=book_summary,
+                cover=book_cover,
                 publisher=request.POST.get("publisher"),
                 publishing_date=request.POST.get("publishingYear"),
                 purchase_date=request.POST.get("purchaseDate"),
