@@ -101,7 +101,6 @@ def login_view(request):
         else:
             if not remember_me:
                 request.session.set_expiry(0)
-            print(remember_me)
             login(request, user)
             return redirect('profile')
     return render(request, "artax/login.html")
