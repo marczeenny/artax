@@ -1,0 +1,21 @@
+{% extends "artax/layout.html" %}
+{% load static %}
+{% block title %}Email Confirmed{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+  <main>
+    <div class="container">
+
+      <section class="section email-confirmed min-vh-100 d-flex flex-column align-items-center justify-content-center">
+        <h1>Check the user's inbox</h1>
+        <h2>Click the link sent by email to get started with <strong>ARTAX</strong>.</h2>
+        <a class="btn" href="{% url 'login' %}">Login</a>
+        <img src="{% static 'artax/img/png/logo.png' %}" class="img-fluid py-5" alt="">
+      </section>
+
+    </div>
+  </main><!-- End #main -->
+
+{% endblock %}
