@@ -29,7 +29,7 @@
               <div class="card mb-3">
                 <div class="card-body">
                   <div class="pt-4 pb-2">
-                    <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
+                    <h5 class="card-title text-center pb-0 fs-4">Create an Account - ARTAX Admin</h5>
                   </div>
                   {% if messages %}
                         {% for message in messages %}
@@ -37,23 +37,23 @@
                         {% endfor %}
                       {% endif %}
                   <!-- Form Content -->
-                  <form class="row g-3 needs-validation" novalidate method="post" action="{% url 'register' %}">
+                  <form class="row g-3 needs-validation" novalidate method="post" id="register" action="{% url 'register' %}">
                     {% csrf_token %}
                     <div class="col-md-6">
                       <label for="first_name" class="form-label">First Name</label>
-                      <input type="text" name="first_name" class="form-control form-control" id="first_name" required>
+                      <input type="text" name="first_name" class="form-control" id="first_name" required>
                       <div class="invalid-feedback">Please enter your first name!</div>
                     </div>
 
                     <div class="col-md-6">
                       <label for="last_name" class="form-label">Last Name</label>
-                      <input type="text" name="last_name" class="form-control form-control" id="last_name" required>
+                      <input type="text" name="last_name" class="form-control" id="last_name" required>
                       <div class="invalid-feedback">Please enter your last name!</div>
                     </div>
 
                     <div class="col-md-6">
                       <label for="yourEmail" class="form-label">Email address</label>
-                      <input type="email" name="email" class="form-control form-control" id="yourEmail" required>
+                      <input type="email" name="email" class="form-control" id="yourEmail" required>
                       <div class="invalid-feedback">Please enter a valid email address!</div>
                     </div>
 
@@ -61,46 +61,46 @@
                       <label for="yourUsername" class="form-label">Username</label>
                       <div class="input-group has-validation">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
-                        <input type="text" name="username" class="form-control form-control" id="yourUsername" required>
+                        <input type="text" name="username" class="form-control" id="yourUsername" required>
                         <div class="invalid-feedback">Please choose a username.</div>
                       </div>
                     </div>
 
                     <div class="col-md-6">
                       <label for="yourPassword" class="form-label">Password</label>
-                      <input type="password" name="password" class="form-control form-control" id="yourPassword" required>
+                      <input type="password" name="password" class="form-control" id="yourPassword" required>
                       <div class="invalid-feedback">Please enter your password!</div>
                     </div>
 
                     <div class="col-md-6">
                       <label for="confirmPassword" class="form-label">Confirm Password</label>
-                      <input type="password" name="pwd_conf" class="form-control form-control" id="confirmPassword" required>
-                      <div class="invalid-feedback">Please enter your password!</div>
+                      <input type="password" name="pwd_conf" class="form-control" id="confirmPassword" required>
+                      <div class="invalid-feedback">Please confirm your password!</div>
                     </div>
+
 
                     <div class="col-md-6">
-                      <!-- Empty Column -->
+                        <label for="role" class="form-label">Roles and Permissions</label>
+                        <select id="role" class="form-select" name="role">
+                            <option value="0" selected>Chose a role</option>
+                            <option value="1">System Administrator</option>
+                            <option value="2">Office Administrator</option>
+                            <option value="3">Lawyer</option>
+                            <option value="4">Visitor</option>
+                        </select>
                     </div>
 
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                      <button class="btn btn-primary w-100" type="submit" disabled>Create Account</button>
                     </div>
 
                     <div class="col-12">
-                      <p class="small mb-0">Already have an account? <a href="{% url 'login' %}">Log in instead</a></p>
+                      <p class="small mb-0">A verification link will be sent to the email addressed entered.</p>
                     </div>
                   </form>
 
                 </div>
               </div>
-
-              <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-              </div>
-
             </div>
           </div>
         </div>
@@ -108,5 +108,48 @@
       </section>
 
     </div>
-</main><!-- End #main -->
+</main>
+<script>
+    const passwordInput = document.getElementById('yourPassword');
+    const confirmInput = document.getElementById('confirmPassword');
+    const invalidFeedback = document.querySelector('.invalid-feedback');
+    const registerForm = document.querySelector("#register");
+    const submitButton = registerForm.querySelector("button[type='submit']")
+
+    document.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", () => {
+            const input_value = input.value.replace(/\\s+/g);
+            if (input_value === "" && input.required) {
+                input.classList.add("is-invalid");
+                submitButton.disabled = true
+            }
+            else {
+                console.log(input)
+                input.classList.remove("is-invalid");
+                submitButton.disabled = false
+            }
+            if (input.id === "confirmPassword" || input.id === "yourPassword") {
+                if (confirmInput.value !== passwordInput.value && confirmInput.value !== "") {
+                    input.classList.add('is-invalid');
+                    submitButton.disabled = true
+
+                } else {
+                    input.classList.remove('is-invalid');
+                    submitButton.disabled = false
+                }
+            }
+        })
+    })
+    registerForm.addEventListener("submit", event => {
+        const roleSelect = document.querySelector("select");
+        if (roleSelect.value === "0") {
+            event.preventDefault()
+            event.stopPropagation()
+            roleSelect.classList.add("is-invalid");
+        }
+        else {
+            roleSelect.classList.remove("is-invalid");
+        }
+    })
+</script>
 {% endblock %}
