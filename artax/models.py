@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 from phonenumber_field.modelfields import PhoneNumberField
+from django.core.validators import EmailValidator
 
 
 def custom_summary_filename(instance, filename):
@@ -17,7 +18,8 @@ def custom_cover_filename(instance, filename):
 
 
 class User(AbstractUser):
-    email = models.EmailField(blank=True, unique=True)
+    email = models.EmailField(blank=True, unique=True, validators=[EmailValidator(
+        message="Please enter a valid email address.")])
     about = models.TextField()
     job = models.CharField(max_length=200)
     address = models.TextField()
