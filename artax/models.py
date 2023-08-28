@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import EmailValidator
+import os
 
 
 def custom_summary_filename(instance, filename):
@@ -12,8 +13,9 @@ def custom_summary_filename(instance, filename):
 
 
 def custom_cover_filename(instance, filename):
+    _, file_extension = os.path.splitext(filename)
     book_id = Book.objects.all().last().pk
-    filename = f"{book_id + 1}-cover"
+    filename = f"{book_id + 1}-cover{file_extension}"
     return f"cover/{filename}"
 
 
