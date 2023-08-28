@@ -311,20 +311,6 @@
     }, 200);
   }
 
-  function showLoadingAnimation() {
-  document.getElementById("loading-animation").style.display = "block";
-}
 
-// Hide the loading animation
-  function hideLoadingAnimation() {
-    document.getElementById("loading-animation").style.display = "none";
-  }
-
-  // Call the showLoadingAnimation() function when your website starts loading content
-  showLoadingAnimation();
-
-  // Call the hideLoadingAnimation() function when your website finishes loading
-  // This can be done in the 'load' event of the window or when the necessary content is ready.
-  // hideLoadingAnimation();
 
 })();
