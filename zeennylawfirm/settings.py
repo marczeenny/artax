@@ -81,10 +81,16 @@ WSGI_APPLICATION = 'zeennylawfirm.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'artax',
+        'USER': 'postgres',
+        'PASSWORD': 'marc2006',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 # Password validation

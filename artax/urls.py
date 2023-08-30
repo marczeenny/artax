@@ -2,9 +2,13 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
+from django.views.static import serve
+
 
 urlpatterns = [
     path("", views.index, name="index"),
+    re_path(r'^media/(?P<path>.*)$', login_required(serve), {'document_root': settings.MEDIA_ROOT}),
     path("faq/", views.faq, name="faq"),
     path("contact/", views.contact, name="contact"),
     path("blank/", views.blank, name="blank"),
