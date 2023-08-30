@@ -134,20 +134,13 @@
 
         {% nav_link 'index' 'Dashboard ' 'grid' %}<!-- End Dashboard Nav -->
 
-        <li class="nav-heading">Clients</li>
-        {% nav_link 'all_clients' 'Clients' 'people' %}
-        {% nav_link 'new_client' 'New Client' 'person-plus' %}
-        {% nav_link 'index' 'Query Clients' 'search' %}
+
 
         <li class="nav-heading">Books</li>
         {% nav_link 'all_books' 'Books' 'journal-bookmark' %}
         {% nav_link 'new_book' 'New Book' 'journal-plus' %}
         {% nav_link 'book_queries' 'Query Books ' 'search' %}
 
-        <li class="nav-heading">Files</li>
-        {% nav_link 'all_files' 'Files ' 'file-earmark-text' %}
-        {% nav_link 'new_file' 'New File' 'file-earmark-plus' %}
-        {% nav_link 'file_queries' 'Query Files ' 'search' %}
 
         <li class="nav-heading">Users</li>
         <!-- End Profile Page Nav -->
@@ -162,7 +155,18 @@
             {% nav_link 'logout' 'Logout' 'box-arrow-right' %}
         {% endif %}
 
-        {% nav_link 'blank' 'Blank Page' 'file-earmark-arrow-up' %}<!-- End Blank Page Nav -->
+        {% nav_link 'blank' 'Blank Page' 'file-earmark-arrow-up' %}
+        <hr>
+        <li class="nav-heading">UNDER CONSTRUCTION</li>
+        <li class="nav-heading">Clients</li>
+        {% nav_link 'all_clients' 'Clients' 'people' %}
+        {% nav_link 'new_client' 'New Client' 'person-plus' %}
+        {% nav_link 'under_construction' 'Query Clients' 'search' %}
+
+        <li class="nav-heading">Files</li>
+        {% nav_link 'all_files' 'Files ' 'file-earmark-text' %}
+        {% nav_link 'new_file' 'New File' 'file-earmark-plus' %}
+        {% nav_link 'file_queries' 'Query Files ' 'search' %}
 
     </ul>
 
