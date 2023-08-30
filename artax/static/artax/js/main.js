@@ -311,6 +311,55 @@
     }, 200);
   }
 
+  if (document.getElementById("record")) {
+    if (!document.getElementById("isCover")) {
+      const selectImageButton = document.getElementById("select-image-button");
+      const imageInput = document.getElementById("image-input");
 
+      selectImageButton.addEventListener("click", () => {
+        imageInput.click();
+      });
+
+      imageInput.addEventListener("change", () => {
+        document.getElementById("image-form").submit();
+      });
+
+    } else if (!document.getElementById("isSummary")) {
+
+      const selectFileButton = document.getElementById("select-file-button");
+      const fileInput = document.getElementById("file-input");
+
+      selectFileButton.addEventListener("click", () => {
+        fileInput.click();
+      })
+
+      fileInput.addEventListener("change", () => {
+        document.getElementById("file-form").submit();
+      });
+    }
+  }
+
+  if (document.getElementById("book_query")) {
+    const form = document.getElementById('mfqf');
+    const inputsAndSelects = form.querySelectorAll('input[type="text"], select, textarea');
+
+    inputsAndSelects.forEach(input => {
+      const originalValue = input.value;
+
+      const handleChange = () => {
+        if (input.value !== originalValue) {
+          input.classList.add('is-valid');
+        } else {
+          input.classList.remove('is-valid');
+        }
+      };
+
+      if (input.tagName === 'INPUT' || input.tagName === "TEXTAREA") {
+        input.addEventListener('input', handleChange);
+      } else if (input.tagName === 'SELECT') {
+        input.addEventListener('change', handleChange);
+      }
+    });
+  }
 
 })();

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -20,8 +20,10 @@ urlpatterns = [
     path("change-password/", views.change_password, name="change_password"),
     path("logout/", views.logout_view, name="logout"),
     path("books/new-book/", views.new_book, name="new_book"),
-    path('books/summary/<int:book_id>/', views.view_book_summary, name='view_book_summary'),
-    path('books/cover/<int:book_id>/', views.view_book_cover, name='view_book_cover'),
+    path('books/summary/add/<int:book_id>/', views.change_book_summary, name='change_book_summary'),
+    path('books/cover/add/<int:book_id>/', views.change_book_cover, name='change_book_cover'),
+    path('books/summary/remove/<int:book_id>/', views.remove_book_summary, name='remove_book_summary'),
+    path('books/cover/remove/<int:book_id>/', views.remove_book_cover, name='remove_book_cover'),
     path("books/queries/", views.book_queries, name="book_queries"),
     path("books/", views.all_books, name="all_books"),
     path("books/query-by/", views.query_books_by, name="query_books_by"),

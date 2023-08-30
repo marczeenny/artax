@@ -1,35 +1,43 @@
 import datetime
-
-from django.contrib.auth import authenticate, login, logout
+from functools import wraps
+from smtplib import SMTPRecipientsRefused
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.models import Group
+from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from .models import User, Book, Client, File, Author, Type, Location, Language
 from django.core.paginator import Paginator
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.contrib import messages
 import qrcode
 import qrcode.image.svg
-from django.core.validators import URLValidator, EmailValidator
+from django.db.models import Q
+# from pillow import Image, ImageDraw, ImageFont
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
+from django.core.mail import *
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
 RED = '\033[91m'
 RESET = '\033[0m'
 
+BASE_URL = ''
+
 PER_PAGE = 25
 
 
-def staff_required(function):
-    """
-    Decorator to check if the user is staff.
-    """
+def redirect_view(function):
+    def _function(request, *args, **kwargs):
+        return redirect('under_construction')
 
+    return _function
+
+
+def staff_required(function):
     def wrapper(request, *args, **kwargs):
         if request.user.is_active and request.user.is_staff:
             return function(request, *args, **kwargs)
@@ -66,6 +74,10 @@ def download_qr_code(request, string_to_encode):
     response["Content-Disposition"] = f"attachment; filename=qr_code.png"
     response.write(qr_code_data)
     return response
+
+
+def under_construction(request):
+    return render(request, "artax/under-construction.html")
 
 
 def faq(request):
@@ -108,7 +120,6 @@ def login_view(request):
 
 @staff_required
 @login_required(login_url="login")
-# @admin_only
 def new_user(request):
     if request.method == "POST":
         password = request.POST.get("password")
@@ -140,10 +151,25 @@ def new_user(request):
             })
             send_mail(subject, message, "email.the.artax.network@gmail.com", [user.email], html_message=message)
             user.save()
-            return redirect("index")
+            role = request.POST.get("role")
+            if role == '1':
+                user.is_superuser = True
+            elif role == '2':
+                user.is_staff = True
+                user.groups.add(Group.objects.get(name="Office Administrator"))
+            elif role == '3':
+                user.groups.add(Group.objects.get(name="Lawyer"))
+            elif role == '4':
+                user.groups.add(Group.objects.get(name="Visitor"))
+
+            return render(request, "artax/email-verify-email.html")
         except IntegrityError:
             messages.error(
                 request, "Username or email already in use, please try again with a new one or log in instead!")
+        except SMTPRecipientsRefused:
+            messages.error(
+                request, "Email address given is unreachable. Please try again."
+            )
             return redirect('register')
     return render(request, "artax/register.html")
 
@@ -175,7 +201,11 @@ def profile(request):
         current_user.email = request.POST.get("email")
         current_user.about = request.POST.get("about")
         current_user.save()
-    return render(request, "artax/users-profile.html")
+    context = {}
+    for user_group in request.user.groups.values_list('name', flat=True):
+        context['clearance'] = user_group
+    # print(context['clearance'])
+    return render(request, "artax/users-profile.html", context=context)
 
 
 @login_required(login_url="login")
@@ -197,6 +227,7 @@ def change_password(request):
         else:
             user.set_password(new_password)
             user.save()
+            update_session_auth_hash(request, request.user)
             return redirect("profile")
     return redirect("profile")
 
@@ -209,34 +240,67 @@ def logout_view(request):
 
 # TODO 2 Book Library ##################################################################################################
 
-
 @login_required(login_url="login")
 def all_books(request):
+    page_obj = paginator_books(request, Book.objects.all())
+    return render(request, "artax/all-books.html", {"page_obj": page_obj})
+
+
+def paginator_books(request, books):
     page_number = request.GET.get('page')
-    books = Book.objects.all()
     if request.GET.get("asc") == 'False':
         books = books[::-1]
     paginator = Paginator(books, PER_PAGE)
     page_obj = paginator.get_page(page_number)
-    return render(request, "artax/all-books.html", {"page_obj": page_obj})
+    return page_obj
 
 
-def view_book_summary(request, book_id):
+@permission_required("artax.change_book", raise_exception=True)
+def remove_book_summary(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    try:
-        response = HttpResponse(book.summary, content_type='application/pdf')
-    except ValueError:
-        raise Http404("Book summary not found.")
-    return response
+    if request.method == 'POST':
+        if book.summary:
+            default_storage.delete(book.summary.path)
+            book.summary = None
+            book.save()
+    return redirect('show_book', book_id=book_id)
 
 
-def view_book_cover(request, book_id):
+@permission_required("artax.change_book", raise_exception=True)
+def remove_book_cover(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    try:
-        response = HttpResponse(book.cover, content_type='application/jpeg')
-    except ValueError:
-        raise Http404("Book cover not found.")
-    return response
+    if request.method == 'POST':
+        if book.cover:
+            default_storage.delete(book.cover.path)
+            book.cover = None
+            book.save()
+    return redirect('show_book', book_id=book_id)
+
+
+@permission_required("artax.change_book", raise_exception=True)
+def change_book_summary(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book_summary = request.FILES.get('bookSummary')
+    if request.method == 'POST' and book_summary and book.summary == '':
+        if book_summary.content_type != "application/pdf":
+            messages.warning(request, "File type for image summary invalid.")
+            return redirect("show_book", book_id=book_id)
+        book.summary = book_summary
+        book.save()
+    return redirect('show_book', book_id=book_id)
+
+
+@permission_required("artax.change_book", raise_exception=True)
+def change_book_cover(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book_cover = request.FILES.get("bookCover")
+    if request.method == 'POST' and book_cover and book.cover == "":
+        if book_cover.content_type != "image/png" and book_cover.content_type != "image/jpg" and book_cover.content_type != "image/jpeg":
+            messages.warning(request, "File type for image cover invalid.")
+            return redirect("show_book", book_id=book_id)
+        book.cover = book_cover
+        book.save()
+    return redirect('show_book', book_id=book_id)
 
 
 @login_required(login_url="login")
@@ -246,63 +310,64 @@ def new_book(request):
         book_id = 1
     else:
         book_id = book_record.id + 1
-    types, authors, locations, languages = Type.objects.all(), Author.objects.all(), Location.objects.all(), Language.objects.all()
+    types, authors, locations, languages = Type.objects.all(), Author.objects.all(), Location.objects.all().order_by("code"), Language.objects.all()
     if request.method == "POST":
-        if Book.objects.filter(title=request.POST.get("bookTitle")).first():
-            messages.warning(request, "A book already exists with that title. Choose another one and try again.")
-            return redirect('new_book')
+        if not request.user.has_perm("artax.add_book"):
+            raise PermissionDenied
         else:
-            book_type = Type.objects.get(pk=request.POST.get("bookType"))
-            special_id = f"{book_type.code}{Book.objects.filter(type=book_type).count() + 1}"
+            if Book.objects.filter(title=request.POST.get("bookTitle")).first():
+                messages.warning(request, "A book already exists with that title. Choose another one and try again.")
+                return redirect('new_book')
+            else:
+                book_type = Type.objects.get(pk=request.POST.get("bookType"))
+                special_id = f"{book_type.code}{Book.objects.filter(type=book_type).count() + 1}"
 
-            purchase_date = request.POST.get("purchaseDate")
-            isbn = request.POST.get("isbn")
-            if purchase_date == '':
-                purchase_date = None
-            if isbn == '':
-                isbn = None
+                purchase_date = request.POST.get("purchaseDate")
+                if purchase_date == '':
+                    purchase_date = None
 
-            book_summary = request.FILES.get("bookSummary")
-            book_cover = request.FILES.get("bookCover")
+                book_summary = request.FILES.get("bookSummary")
+                book_cover = request.FILES.get("bookCover")
 
-            if book_summary.content_type != "application/pdf":
-                messages.warning(request, "File type for summary invalid.")
-                return redirect("new_book")
-            if book_cover.content_type != "image/png" or book_cover.content_type != "image/jpg" or book_cover.content_type != "image/jpeg":
-                messages.warning(request, "File type for image cover invalid.")
-                return redirect("new_book")
+                if book_summary is not None and book_summary.content_type != "application/pdf":
+                    messages.warning(request, "File type for summary invalid.")
+                    return redirect("new_book")
+                if book_cover is not None and book_cover.content_type != "image/png" and book_cover.content_type != "image/jpg" and book_cover.content_type != "image/jpeg":
+                    messages.warning(request, "File type for image cover invalid.")
+                    return redirect("new_book")
 
-            new_book_record = Book(
-                lib_id=special_id,
-                author=Author.objects.get(pk=request.POST.get("authorName")),
-                title=request.POST.get("bookTitle"),
-                subject=request.POST.get("subject", None),
-                type=Type.objects.get(pk=request.POST.get("bookType")),
-                section=request.POST.get("bookSection", None),
-                location=Location.objects.get(pk=request.POST.get("bookLocation")),
-                language=Language.objects.get(pk=request.POST.get("bookLanguage")),
-                summary=book_summary,
-                cover=book_cover,
-                publisher=request.POST.get("publisher"),
-                publishing_date=request.POST.get("publishingYear"),
-                purchase_date=purchase_date,
-                isbn=isbn,
-                number_of_copies=request.POST.get("numberOfCopies"),
-                registrator=request.user,
-                last_editor=request.user,
-                last_edit_time=datetime.datetime.now(),
-            )
-            try:
-                new_book_record.save()
-            except ValueError as error:
-                messages.warning(request, f"{error}")
-                return redirect("new_book")
-            except ValidationError as error:
-                messages.warning(request, f"{error}")
-                return redirect("new_book")
-        return redirect("show_book", book_id=book_id)
+                new_book_record = Book(
+                    lib_id=special_id,
+                    author=Author.objects.get(pk=request.POST.get("authorName")),
+                    title=request.POST.get("bookTitle"),
+                    subject=request.POST.get("subject", None),
+                    type=book_type,
+                    section=request.POST.get("bookSection", None),
+                    location=Location.objects.get(pk=request.POST.get("bookLocation")),
+                    language=Language.objects.get(pk=request.POST.get("bookLanguage")),
+                    summary=book_summary,
+                    cover=book_cover,
+                    publisher=request.POST.get("publisher"),
+                    publishing_date=request.POST.get("publishingYear"),
+                    purchase_date=purchase_date,
+                    isbn=request.POST.get("isbn", None),
+                    number_of_copies=request.POST.get("numberOfCopies"),
+                    registrator=request.user,
+                    last_editor=request.user,
+                    last_edit_time=datetime.datetime.now(),
+                )
+                try:
+                    new_book_record.save()
+                except ValueError as error:
+                    messages.warning(request, f"ValueError: {error}")
+                    return redirect("new_book")
+                except ValidationError as error:
+                    messages.warning(request, f"ValidationError: {error}")
+                    return redirect("new_book")
+            return redirect("show_book", book_id=book_id)
     return render(request, "artax/new-book.html", {"book_id": book_id, "types": types, "locations": locations,
-                                                   "authors": authors, "languages": languages, "url_arg": f"books%2F{book_id}%2F"})
+                                                   "authors": authors, "languages": languages,
+                                                   "url_arg": f"{BASE_URL}books%2F{book_id}%2F"})
 
 
 @login_required(login_url="login")
@@ -311,44 +376,49 @@ def book_queries(request):
         "types": Type.objects.all(),
         "authors": Author.objects.all(),
         "locations": Location.objects.all(),
-        "languages": Location.objects.all(),
+        "languages": Language.objects.all(),
     }
     return render(request, "artax/queries-books.html", context)
-
 
 @login_required(login_url="login")
 def query_books_by(request):
     book_query_param = request.GET.get("book_query_param")
     book_param = request.POST.get("name")
     print(RED, book_query_param, RESET)
-    if book_query_param == "type":
-        books = Book.objects.filter(type__name__icontains=book_param).all()
-    elif book_query_param == "location":
-        books = Book.objects.filter(location__code__icontains=book_param).all()
-        print(RED, f"'{book_param}'")
-        print(books)
-        print(book_query_param, RESET)
-    elif book_query_param == "title":
-        books = Book.objects.filter(title__contains=book_param).all()
-    elif book_query_param == "content":
-        books = Book.objects.filter(subject__icontains=book_param).all()
-    elif book_query_param == "language":
-        books = Book.objects.filter(language__code__icontains=book_param).all()
-    elif book_query_param == "author":
-        books = Book.objects.filter(author__name__icontains=book_param).all()
+    books = Book.objects.all()
+    if book_query_param == "mfqf":
+        filters = {
+            "type": ("type__name__icontains", "type"),
+            "location": ("location__code__icontains", "location"),
+            "title": ("title__icontains", "title"),
+            "content": ("subject__icontains", "content"),
+            "language": ("language__code__icontains", "language"),
+            "author": ("author__name__icontains", "author"),
+            "publisher": ("publisher__icontains", "publisher"),
+        }
+        filter_params = {}
+        for field, (lookup, param_name) in filters.items():
+            value = request.POST.get(param_name)
+            print(field)
+            print(value)
+            if value != "0" and str(value).strip() != "":
+                filter_params[lookup] = value
+
+        if filter_params:
+            print(filter_params)
+            books = books.filter(**filter_params)
     else:
-        book = get_object_or_404(Book, lib_id=f"{book_param}{request.POST.get('name_id')}") \
-            if book_query_param == "special_id" else get_object_or_404(Book, pk=book_param)
+        book = get_object_or_404(Book, lib_id=f"{book_param}{request.POST.get('name_id')}") if book_query_param == "special_id" else get_object_or_404(Book, pk=book_param)
         if book is None or book == []:
             return render(request, "artax/record-404.html", {'param': "book"})
         else:
             return redirect("show_book", book_id=book.id)
 
-    if books is None or books == []:
+    if books.exists() is False:
         context = {'param': "book"}
         return render(request, "artax/record-404.html", context)
     else:
-        page_obj = books
+        page_obj = paginator_books(request, books)
         return render(request, "artax/all-books.html", {"page_obj": page_obj})
 
 
@@ -357,29 +427,31 @@ def show_book(request, book_id):
     book_record = get_object_or_404(Book, pk=book_id)
     types, authors, locations, languages = Type.objects.all(), Author.objects.all(), Location.objects.all(), Language.objects.all()
     if request.method == "POST":
-        book_type, book_author, book_location, book_language = Type.objects.get(pk=request.POST.get("type")), Author.objects.get \
-            (pk=request.POST.get("author")), Location.objects.get(pk=request.POST.get("location")), Language.objects.get(pk=request.POST.get("language"))
+        if not request.user.has_perm("artax.change_book"):
+            raise PermissionDenied
+        book_author = Author.objects.get(pk=request.POST.get("author"))
+        book_location = Location.objects.get(pk=request.POST.get("location"))
+        book_language = Language.objects.get(pk=request.POST.get("language"))
         book_record.author = book_author
-        book_record.title = request.POST.get("title")
-        book_record.subject = request.POST.get("subject")
-        book_record.type = book_type
-        book_record.section = request.POST.get("section")
         book_record.locations = book_location
         book_record.language = book_language
+        book_record.title = request.POST.get("title")
+        book_record.subject = request.POST.get("subject")
+        book_record.section = request.POST.get("section")
         book_record.publisher = request.POST.get("publisher")
         book_record.publishing_date = request.POST.get("publishing_date")
-        book_record.last_edit_time = datetime.datetime.now()
-        book_record.last_edit = request.user
         book_record.isbn = request.POST.get("isbn")
         book_record.number_of_copies = request.POST.get("numberOfCopies")
-        print(RED + request.POST.get("numberOfCopies") + RESET)
-        book_record.lib_id = f"{book_type.code}{book_record.lib_id[3:6]}"
+        book_record.last_edit_time = datetime.datetime.now()
+        book_record.last_editor = request.user
         book_record.save()
     return render(request, "artax/record-book.html", {"book": book_record, "types": types, "locations": locations,
-                                                      "authors": authors, "languages": languages, "url_arg": f"books%2F{book_id}%2F"
+                                                      "authors": authors, "languages": languages,
+                                                      "url_arg": f"{BASE_URL}books%2F{book_id}%2F"
                                                       })
 
 
+@permission_required("artax.delete_book", raise_exception=True)
 @login_required(login_url="login")
 def delete_book(request, book_id):
     Book.objects.get(pk=book_id).delete()
@@ -388,7 +460,7 @@ def delete_book(request, book_id):
 
 # TODO 3 File System ###################################################################################################
 
-
+@redirect_view
 @login_required(login_url="login")
 def add_new_file(request):
     file_for_id = File.objects.all().last()
@@ -410,9 +482,10 @@ def add_new_file(request):
         return redirect("show_file", file_id=file_for_id)
     return render(request, "artax/new-file.html",
                   {"file_id": file_for_id, "clients": clients,
-                   "locations": locations, "url_arg": f"files%2F{file_for_id}%2F"})
+                   "locations": locations, "url_arg": f"{BASE_URL}files%2F{file_for_id}%2F"})
 
 
+@redirect_view
 @login_required(login_url="login")
 def all_files(request):
     print(request)
@@ -425,6 +498,7 @@ def all_files(request):
     return render(request, "artax/all-files.html", {"page_obj": page_obj})
 
 
+@redirect_view
 @login_required(login_url="login")
 def file_queries(request):
     clients = Client.objects.all()
@@ -432,6 +506,7 @@ def file_queries(request):
     return render(request, "artax/queries-files.html", {"clients": clients, "locations": locations})
 
 
+@redirect_view
 @login_required(login_url="login")
 def query_files_by(request):
     print(RED, "Hello")
@@ -454,6 +529,7 @@ def query_files_by(request):
     return render(request, "artax/all-files.html", {"page_obj": files})
 
 
+@redirect_view
 @login_required(login_url="login")
 def show_file(request, file_id):
     file_record = get_object_or_404(File, pk=file_id)
@@ -468,9 +544,10 @@ def show_file(request, file_id):
         file_record.location = location
         file_record.save()
     return render(request, "artax/record-file.html", {"file": file_record, "clients": clients,
-                                                      "locations": locations, "url_arg": f"files%2F{file_id}%2F"})
+                                                      "locations": locations, "url_arg": f"{BASE_URL}files%2F{file_id}%2F"})
 
 
+@redirect_view
 @login_required(login_url="login")
 def delete_file(request, file_id):
     print(request)
@@ -480,7 +557,7 @@ def delete_file(request, file_id):
 
 # TODO 4 Client System #################################################################################################
 
-
+@redirect_view
 @login_required(login_url="login")
 def all_clients(request):
     page_number = request.GET.get('page')
@@ -492,6 +569,7 @@ def all_clients(request):
     return render(request, "artax/all-clients.html", {"page_obj": page_obj})
 
 
+@redirect_view
 @login_required(login_url="login")
 def new_client(request):
     return render(request, "artax/new-client.html")

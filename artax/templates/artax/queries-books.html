@@ -3,195 +3,147 @@
 {% block content %}
 
 
- <main id="main" class="main">
+    <main id="main" class="main">
 
-    <div class="pagetitle">
-      <h1>Query Books</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="">Home</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'all_books' %}">Books</a></li>
-          <li class="breadcrumb-item active"><a href="{% url 'query_books_by' %}">Query</a></li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+        <div class="pagetitle">
+            <h1>Query Books</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'all_books' %}">Books</a></li>
+                    <li class="breadcrumb-item active"><a href="{% url 'query_books_by' %}">Query</a></li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
 
-    <section class="section">
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by ID</h5>
-              <form action="{% url 'query_books_by' %}" method="post">
-                {% csrf_token %}
-                <div class="row mb-3 form-floating">
-                  <label for="ID" class="col-sm-2 col-form-label">ID</label>
-                  <div class=" input-group">
-                    <span class="input-group-text" id="inputGroupPrepend">#</span>
-                    <input type="number" class="form-control" id="ID" placeholder="ID" min="1" value="1" name="name">
-                  </div>
+        <section class="section">
+            <a hidden="hidden" id="book_query"></a>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Multi Filter Query Form (MFQF)</h5>
+                            <form action="{% url 'query_books_by' %}?book_query_param=mfqf" method="post" id="mfqf">
+                                {% csrf_token %}
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputType" class="form-label">Type</label>
+                                        <select id="inputType" class="form-select" name="type">
+                                            <option selected value="0">Select a book type</option>
+                                            {% for i in types %}
+                                                <option value="{{ i.name }}" name="type">{{ i.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputLocation" class="form-label">Location</label>
+                                        <select id="inputLocation" class="form-select" name="location">
+                                            <option selected value="0">Select a location</option>
+                                            {% for loc in locations %}
+                                                <option value="{{ loc }}" name="location">{{ loc }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="authorInput" class="form-label">Author</label>
+                                        <select class="form-select" id="authorInput" name="author">
+                                            <option selected value="0">Select an author</option>
+                                            {% for i in authors %}
+                                                <option value="{{ i }}" name="author">{{ i }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="inputTitle" class="form-label">Title</label>
+                                        <input type="text" class="form-control" id="inputTitle"
+                                               placeholder="Enter anything included in your book's title..." name="title">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="inputContent" class="form-label">Content</label>
+                                        <textarea style="height: 120px;" class="form-control" id="inputContent" placeholder="Enter anything included in your book's content..." name="content"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputLanguage" class="form-label">Language</label>
+                                        <select id="inputLanguage" class="form-select" name="language">
+                                            <option selected value="0">Select a language</option>
+                                            {% for lang in languages %}
+                                                <option value="{{ lang.code }}" name="language">{{ lang.code }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="inputPublisher" class="form-label">Publisher</label>
+                                        <input type="text" class="form-control" id="inputPublisher" placeholder="Enter a publisher name" name="publisher">
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-success" onclick="loading();">Query
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Query by ID</h5>
+                            <form action="{% url 'query_books_by' %}" method="post">
+                                {% csrf_token %}
+                                <div class="row mb-3 form-floating">
+                                    <label for="ID" class="col-sm-2 col-form-label">ID</label>
+                                    <div class=" input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">#</span>
+                                        <input type="number" class="form-control" id="ID" placeholder="ID" min="1"
+                                               value="1" name="name">
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Query by Special ID</h5>
+                            <form action="{% url 'query_books_by' %}?book_query_param=special_id" method="post">
+                                {% csrf_token %}
+                                <div class="row mb-3">
+                                    <div class="col-sm-6 mb-3 mb-sm-0"> <!-- Add 'mb-3' class here -->
+                                        <div class="form-floating">
+                                            <select class="form-select" id="book_type_code" aria-label="Type Code"
+                                                    name="name">
+                                                {% for i in types %}
+                                                    <option value="{{ i.code }}">{{ i.code }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label for="book_type_code">Type Code</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-floating">
+                                            <div class="form-floating">
+                                                <input type="number" class="form-control" value="1" min="1"
+                                                       id="book_id_num" placeholder="Type #" name="name_id">
+                                                <label for="book_id_num">Type #</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-              </form>
             </div>
-          </div>
-
-        </div>
-        <div class="col-lg-6">
-
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Special ID</h5>
-              <form action="{% url 'query_books_by' %}?book_query_param=special_id" method="post">
-  {% csrf_token %}
-  <div class="row mb-3">
-    <div class="col-sm-6 mb-3 mb-sm-0"> <!-- Add 'mb-3' class here -->
-      <div class="form-floating">
-        <select class="form-select" id="book_type_code" aria-label="Type Code" name="name">
-          {% for i in types %}
-          <option value="{{ i.code }}">{{ i.code }}</option>
-          {% endfor %}
-        </select>
-        <label for="book_type_code">Type Code</label>
-      </div>
-    </div>
-    <div class="col-sm-6">
-      <div class="form-floating">
-        <div class="form-floating">
-          <input type="number" class="form-control" value="1" min="1" id="book_id_num" placeholder="Type #" name="name_id">
-          <label for="book_id_num">Type #</label>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="text-center">
-    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-  </div>
-</form>
-
-            </div>
-          </div>
-
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Type</h5>
-              <form action="{% url 'query_books_by' %}?book_query_param=type" method="post">
-                {% csrf_token %}
-                <div class="form-floating">
-                    <select class="form-select" id="bookType" aria-label="State"  name="name">
-                      {% for i in types %}
-                      <option value="{{ i.name }}" name="name">{{ i.name }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="bookType">Type</label>
-                </div>
-                <br>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-        </div>
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Title</h5>
-                <form action="{% url 'query_books_by' %}?book_query_param=title" method="post">
-                  {% csrf_token %}
-                  <div class="form-floating">
-                    <input type="text" class="form-control" id="title" placeholder="Title" name="name">
-                    <label for="title">Title</label>
-                  </div>
-                  <br>
-                  <div class="text-center">
-                  <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-                </div>
-                </form>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Author</h5>
-              <form action="{% url 'query_books_by' %}?book_query_param=author" method="post">
-                {% csrf_token %}
-                <div class="form-floating">
-                    <select class="form-select" id="bookAuthor" aria-label="State"  name="name">
-                      {% for i in authors %}
-                      <option value="{{ i }}" name="name">{{ i }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="bookAuthor">Author</label>
-                </div>
-                <br>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Location</h5>
-              <form action="{% url 'query_books_by' %}?book_query_param=location" method="post">
-                {% csrf_token %}
-                <div class="form-floating">
-                    <select class="form-select" id="bookLocation" aria-label="State"  name="name">
-                      {% for loc in locations %}
-                      <option value="{{ loc }}" name="name">{{ loc }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="bookLocation">Location</label>
-                </div>
-                <br>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Query by Content</h5>
-                <form action="{% url 'query_books_by' %}?book_query_param=content" method="post">
-                  {% csrf_token %}
-                  <div class="form-floating">
-                    <input type="text" class="form-control" id="sub" placeholder="Content" name="name">
-                    <label for="title">Content</label>
-                  </div>
-                  <br>
-                  <div class="text-center">
-                    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
-                  </div>
-                </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-  </main><!-- End #main -->
+        </section>
+    </main>
 {% endblock %}

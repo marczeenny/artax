@@ -7,15 +7,20 @@ import os
 
 
 def custom_summary_filename(instance, filename):
+    _, file_extension = os.path.splitext(filename)
     book_id = Book.objects.all().last().pk
-    filename = f"{book_id + 1}-summary.pdf"
+    if book_id is None:
+        book_id = 0
+    filename = f"{instance.id if instance.id is not None else book_id + 1}-summary{file_extension}"
     return f"summaries/{filename}"
 
 
 def custom_cover_filename(instance, filename):
     _, file_extension = os.path.splitext(filename)
     book_id = Book.objects.all().last().pk
-    filename = f"{book_id + 1}-cover{file_extension}"
+    if book_id is None:
+        book_id = 0
+    filename = f"{instance.id if instance.id is not None else book_id + 1}-cover{file_extension}"
     return f"cover/{filename}"
 
 
@@ -25,7 +30,7 @@ class User(AbstractUser):
     about = models.TextField()
     job = models.CharField(max_length=200)
     address = models.TextField()
-    phone = models.CharField(max_length=100)
+    phone = PhoneNumberField(null=True, region="LB")
     date_of_registration = models.DateField(default=datetime.today)
 
     def __str__(self):
@@ -45,10 +50,10 @@ class Book(models.Model):
     location = models.ForeignKey("Location", models.PROTECT, related_name="book", null=True)
     publisher = models.CharField(max_length=250)
     publishing_date = models.CharField(max_length=250, null=True)
-    purchase_date = models.DateField(null=True)
+    purchase_date = models.DateField(null=True, blank=True)
     summary = models.FileField(upload_to=custom_summary_filename, blank=True, null=True)
     cover = models.ImageField(upload_to=custom_cover_filename, blank=True, null=True)
-    isbn = models.IntegerField(null=True)
+    isbn = models.CharField(max_length=14, blank=True, null=True)
     number_of_copies = models.IntegerField()
     language = models.ForeignKey("Language", models.SET_NULL, related_name="book", null=True)
     date_of_registration = models.DateField(default=datetime.today)
