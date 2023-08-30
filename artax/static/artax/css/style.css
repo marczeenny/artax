@@ -1,6 +1,31 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('../fonts/nunito.woff2') format('woff2');
+    /* Add more font formats as needed */
+    font-weight: auto;
+    font-style: auto;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('../fonts/open-sans-2.woff2') format('woff2'),
+         url('../fonts/open-sans-1.woff2') format('woff2');
+    font-weight: auto;
+    font-style: auto;
+}
+
+@font-face {
+    font-family: 'MyFont';
+    src: url('../fonts/poppins.woff2') format('woff2');
+    /* Add more font formats as needed */
+    font-weight: auto;
+    font-style: auto;
+}
+
 :root {
   scroll-behavior: smooth;
 }
