@@ -12,7 +12,7 @@
                     <li class="breadcrumb-item"><a href="">Home</a></li>
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{% url 'all_books' %}">Books</a></li>
-                    <li class="breadcrumb-item active"><a href="{% url 'query_books_by' %}">Query</a></li>
+                    <li class="breadcrumb-item active">Query</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -24,8 +24,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Multi Filter Query Form (MFQF)</h5>
-                            <form action="{% url 'query_books_by' %}?book_query_param=mfqf" method="post" id="mfqf">
-                                {% csrf_token %}
+                            <form action="{% url 'query_books_by' %}" method="get" id="mfqf">
+                                <input name="book_query_param" value="mfqf" hidden="hidden">
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3">
                                         <label for="inputType" class="form-label">Type</label>
@@ -64,7 +64,7 @@
                                         <textarea style="height: 120px;" class="form-control" id="inputContent" placeholder="Enter anything included in your book's content..." name="content"></textarea>
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6">
                                         <label for="inputLanguage" class="form-label">Language</label>
                                         <select id="inputLanguage" class="form-select" name="language">
                                             <option selected value="0">Select a language</option>
@@ -73,12 +73,12 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 mb-3">
                                         <label for="inputPublisher" class="form-label">Publisher</label>
                                         <input type="text" class="form-control" id="inputPublisher" placeholder="Enter a publisher name" name="publisher">
                                     </div>
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-success" onclick="loading();">Query
+                                        <button type="submit" class="btn btn-success">Query
                                         </button>
                                     </div>
                                 </div>
@@ -91,8 +91,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Query by ID</h5>
-                            <form action="{% url 'query_books_by' %}" method="post">
-                                {% csrf_token %}
+                            <form action="{% url 'query_books_by' %}" method="get">
+                                <input hidden="hidden" value="id" name="book_query_param">
                                 <div class="row mb-3 form-floating">
                                     <label for="ID" class="col-sm-2 col-form-label">ID</label>
                                     <div class=" input-group">
@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -112,10 +112,10 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Query by Special ID</h5>
-                            <form action="{% url 'query_books_by' %}?book_query_param=special_id" method="post">
-                                {% csrf_token %}
+                            <form action="{% url 'query_books_by' %}" method="get">
+                                <input hidden="hidden" value="special_id" name="book_query_param">
                                 <div class="row mb-3">
-                                    <div class="col-sm-6 mb-3 mb-sm-0"> <!-- Add 'mb-3' class here -->
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
                                         <div class="form-floating">
                                             <select class="form-select" id="book_type_code" aria-label="Type Code"
                                                     name="name">
@@ -137,7 +137,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary" onclick="loading();">Submit</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </form>
                         </div>
