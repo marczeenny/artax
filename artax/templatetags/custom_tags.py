@@ -1,9 +1,6 @@
-import base64
-
 from django import template
 from django.shortcuts import reverse
 from django.utils.safestring import mark_safe
-import qrcode
 
 register = template.Library()
 
