@@ -311,7 +311,7 @@
     }, 200);
   }
 
-  if (document.getElementById("record")) {
+  if (document.getElementById("record-book")) {
     if (!document.getElementById("isCover")) {
       const selectImageButton = document.getElementById("select-image-button");
       const imageInput = document.getElementById("image-input");
@@ -360,6 +360,102 @@
         input.addEventListener('change', handleChange);
       }
     });
+  }
+
+
+
+  if (document.getElementById("login-form")) {
+    const form = document.getElementById("login-form");
+    const inputs = form.querySelectorAll('input[type="email"] input[type="password"]');
+
+    function validateInput(event) {
+        const input = event.target;
+        if (input.value === '') {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+
+        }
+
+    }
+
+    // Add event listener to each input field
+    inputs.forEach(input => {
+        input.addEventListener('blur', validateInput);
+
+    });
+
+  }
+
+
+
+
+  if (document.getElementById('register-form')) {
+    const passwordInput = document.getElementById('yourPassword');
+    const confirmInput = document.getElementById('confirmPassword');
+    const invalidFeedback = document.querySelector('.invalid-feedback');
+    const registerForm = document.querySelector("#register");
+    const submitButton = registerForm.querySelector("button[type='submit']")
+
+    document.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", () => {
+            const input_value = input.value.replace(/\\s+/g);
+            if (input_value === "" && input.required) {
+                input.classList.add("is-invalid");
+                submitButton.disabled = true
+            }
+            else {
+                console.log(input)
+                input.classList.remove("is-invalid");
+                submitButton.disabled = false
+            }
+            if (input.id === "confirmPassword" || input.id === "yourPassword") {
+                if (confirmInput.value !== passwordInput.value && confirmInput.value !== "") {
+                    input.classList.add('is-invalid');
+                    submitButton.disabled = true
+
+                } else {
+                    input.classList.remove('is-invalid');
+                    submitButton.disabled = false
+                }
+            }
+        })
+    })
+    registerForm.addEventListener("submit", event => {
+        const roleSelect = document.querySelector("select");
+        if (roleSelect.value === "0") {
+            event.preventDefault()
+            event.stopPropagation()
+            roleSelect.classList.add("is-invalid");
+        }
+        else {
+            roleSelect.classList.remove("is-invalid");
+        }
+    })
+  }
+
+  if (document.getElementById("query_results")) {
+      const elements = [document.getElementById('first'), document.getElementById('last'), document.getElementById('next'), document.getElementById('previous')];
+      document.querySelectorAll('.num').forEach(number => {
+          elements.push(number)
+      })
+      for (const elt of elements) {
+        if (elt) {
+            console.log(elt)
+            elt.addEventListener('click', (event) => {
+                event.preventDefault();
+                elt.href = window.location.href;
+                if (elt.href.indexOf('&page=') !== -1) {
+                    elt.href = elt.href.slice(0, elt.href.indexOf('&page='));
+                    elt.href += '&page=' + elt.dataset.page;
+                    console.log(elt.dataset.page)
+                } else {
+                    elt.href += '&page=' + elt.dataset.page;
+                }
+                window.location.href = elt.href;
+            });
+        }
+    }
   }
 
 })();
