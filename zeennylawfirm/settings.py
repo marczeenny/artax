@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
+
+
+SECRET_KEY = config('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1nj*9ufulm#dzlo1jl(p90i&fejjm67ll!z*bx3m14(z)w4&fy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
@@ -111,6 +114,59 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING_DIR = os.path.join(BASE_DIR, 'logs')  # Create a 'logs' folder in your project directory
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+    },
+    'handlers': {
+        'file_django': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'app.log'),
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'include_html': True,
+        },
+        'users': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'users.log'),
+        },
+        'books': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'books.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file_django'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'users': {
+            'handlers': ['users'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'books': {
+            'handlers': ['books'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    },
+}
+
 
 AUTH_USER_MODEL = 'artax.User'
 # Internationalization
@@ -128,7 +184,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
