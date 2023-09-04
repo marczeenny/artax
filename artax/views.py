@@ -1,8 +1,7 @@
-import datetime
-from functools import wraps
+from datetime import datetime
 from smtplib import SMTPRecipientsRefused
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.sites.shortcuts import get_current_site
+# from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.models import Group
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
@@ -15,19 +14,25 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError, Permissi
 from django.contrib import messages
 import qrcode
 import qrcode.image.svg
+import logging
+import user_agents
+from django.core import serializers
 from django.db.models import Q
 # from pillow import Image, ImageDraw, ImageFont
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import *
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+# from django.contrib.auth.tokens import default_token_generator
+# from django.core.mail import *
+# from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+# from django.template.loader import render_to_string
+
+user_logger = logging.getLogger("users")
+book_logger = logging.getLogger("books")
 
 RED = '\033[91m'
 RESET = '\033[0m'
 
 BASE_URL = ''
 
-PER_PAGE = 25
+per_page = 35
 
 
 def redirect_view(function):
@@ -47,6 +52,7 @@ def staff_required(function):
     return wrapper
 
 
+@login_required
 def index(request):
     return render(request, "artax/dashboard.html")
 
@@ -96,8 +102,9 @@ def blank(request):
 
 
 def login_view(request):
-    if request.method == "POST":
-
+    if request.user.is_authenticated:
+        return redirect("index")
+    elif request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
         remember_me = request.POST.get("rememberMe")
@@ -113,6 +120,8 @@ def login_view(request):
         else:
             if not remember_me:
                 request.session.set_expiry(0)
+            user_logger.info(f"User {username} (User ID: {user.id}) logged on {datetime.now()}"
+                        f" with user-agent {user_agents.parse(request.META.get('HTTP_USER_AGENT', ''))}")
             login(request, user)
             return redirect('profile')
     return render(request, "artax/login.html")
@@ -135,21 +144,21 @@ def new_user(request):
                 password=password,
                 first_name=request.POST.get("first_name"),
                 last_name=request.POST.get("last_name"),
-                is_active=False,
+                # is_active=False,
             )
-            token = default_token_generator.make_token(user)
-            user_pk = user.pk
-            uid = urlsafe_base64_encode(str(user_pk).encode("utf-8"))
+            # token = default_token_generator.make_token(user)
+            # user_pk = user.pk
+            # uid = urlsafe_base64_encode(str(user_pk).encode("utf-8"))
 
-            current_site = get_current_site(request)
-            confirmation_link = f'{current_site.domain}/confirm/{uid}/{token}/'
+            # current_site = get_current_site(request)
+            # confirmation_link = f'{current_site.domain}/confirm/{uid}/{token}/'
 
-            subject = 'Confirm your email'
-            message = render_to_string('artax/email_confirmation_email.html', {
-                'user': user,
-                'confirmation_link': confirmation_link,
-            })
-            send_mail(subject, message, "email.the.artax.network@gmail.com", [user.email], html_message=message)
+            # subject = 'Confirm your email'
+            # message = render_to_string('artax/email_confirmation_email.html', {
+            #     'user': user,
+            #     'confirmation_link': confirmation_link,
+            # })
+            # send_mail(subject, message, "email.the.artax.network@gmail.com", [user.email], html_message=message)
             user.save()
             role = request.POST.get("role")
             if role == '1':
@@ -174,19 +183,19 @@ def new_user(request):
     return render(request, "artax/register.html")
 
 
-def confirm_email(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode("utf-8")
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, ObjectDoesNotExist):
-        user = None
-
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return render(request, 'artax/email_confirmed.html')
-    else:
-        return render(request, 'artax/email_confirmation_invalid.html')
+# def confirm_email(request, uidb64, token):
+#     try:
+#         uid = urlsafe_base64_decode(uidb64).decode("utf-8")
+#         user = User.objects.get(pk=uid)
+#     except (TypeError, ValueError, OverflowError, ObjectDoesNotExist):
+#         user = None
+#
+#     if user is not None and default_token_generator.check_token(user, token):
+#         user.is_active = True
+#         user.save()
+#         return render(request, 'artax/email_confirmed.html')
+#     else:
+#         return render(request, 'artax/email_confirmation_invalid.html')
 
 
 @login_required(login_url="login")
@@ -201,10 +210,15 @@ def profile(request):
         current_user.email = request.POST.get("email")
         current_user.about = request.POST.get("about")
         current_user.save()
+        user_logger.info(f"User {request.user.username} (User ID: {request.user.pk}) edited his profile on {datetime.now()}.")
+        user_logger.info(f"Old User: {serializers.serialize('json', request.user)}")
+        user_logger.info(f"New User: {serializers.serialize('json', current_user)}")
+
     context = {}
     for user_group in request.user.groups.values_list('name', flat=True):
         context['clearance'] = user_group
-    # print(context['clearance'])
+    if request.user.is_superuser:
+        context['clearance'] = 'System Administrator'
     return render(request, "artax/users-profile.html", context=context)
 
 
@@ -227,6 +241,7 @@ def change_password(request):
         else:
             user.set_password(new_password)
             user.save()
+            user_logger.info(f"User {request.user.username} (User ID: {request.user.pk}) changed his password on {datetime.now()}")
             update_session_auth_hash(request, request.user)
             return redirect("profile")
     return redirect("profile")
@@ -234,7 +249,9 @@ def change_password(request):
 
 @login_required(login_url="login")
 def logout_view(request):
+    user = request.user
     logout(request)
+    user_logger.info(f"User {user.username} (User ID: {user.pk}) logged out on {datetime.now()}")
     return redirect("login")
 
 
@@ -250,7 +267,7 @@ def paginator_books(request, books):
     page_number = request.GET.get('page')
     if request.GET.get("asc") == 'False':
         books = books[::-1]
-    paginator = Paginator(books, PER_PAGE)
+    paginator = Paginator(books, per_page)
     page_obj = paginator.get_page(page_number)
     return page_obj
 
@@ -303,7 +320,7 @@ def change_book_cover(request, book_id):
     return redirect('show_book', book_id=book_id)
 
 
-@login_required(login_url="login")
+@login_required
 def new_book(request):
     book_record = Book.objects.all().last()
     if book_record is None:
@@ -354,7 +371,7 @@ def new_book(request):
                     number_of_copies=request.POST.get("numberOfCopies"),
                     registrator=request.user,
                     last_editor=request.user,
-                    last_edit_time=datetime.datetime.now(),
+                    last_edit_time=datetime.now(),
                 )
                 try:
                     new_book_record.save()
@@ -380,13 +397,22 @@ def book_queries(request):
     }
     return render(request, "artax/queries-books.html", context)
 
-@login_required(login_url="login")
+
+@login_required
 def query_books_by(request):
     book_query_param = request.GET.get("book_query_param")
-    book_param = request.POST.get("name")
-    print(RED, book_query_param, RESET)
-    books = Book.objects.all()
-    if book_query_param == "mfqf":
+    book_param = request.GET.get("name")
+    books = Book.objects.all().order_by("id")
+    if book_query_param == "id" or book_query_param == "special_id":
+        print(RED + str(book_query_param))
+        print(str(book_param) + RESET)
+        book = get_object_or_404(Book, lib_id=f"{book_param}{request.GET.get('name_id')}") if book_query_param == "special_id" else get_object_or_404(Book, pk=book_param)
+        if book is None or book == []:
+            print(RED + "404044040440404040")
+            return render(request, "artax/record-404.html", {'param': "book"})
+        else:
+            return redirect("show_book", book_id=book.id)
+    else:
         filters = {
             "type": ("type__name__icontains", "type"),
             "location": ("location__code__icontains", "location"),
@@ -398,28 +424,21 @@ def query_books_by(request):
         }
         filter_params = {}
         for field, (lookup, param_name) in filters.items():
-            value = request.POST.get(param_name)
-            print(field)
-            print(value)
+            value = request.GET.get(param_name)
             if value != "0" and str(value).strip() != "":
                 filter_params[lookup] = value
 
         if filter_params:
-            print(filter_params)
             books = books.filter(**filter_params)
-    else:
-        book = get_object_or_404(Book, lib_id=f"{book_param}{request.POST.get('name_id')}") if book_query_param == "special_id" else get_object_or_404(Book, pk=book_param)
-        if book is None or book == []:
-            return render(request, "artax/record-404.html", {'param': "book"})
-        else:
-            return redirect("show_book", book_id=book.id)
 
     if books.exists() is False:
         context = {'param': "book"}
         return render(request, "artax/record-404.html", context)
     else:
-        page_obj = paginator_books(request, books)
-        return render(request, "artax/all-books.html", {"page_obj": page_obj})
+        page_number = request.GET.get('page')
+        paginator = Paginator(books, per_page)
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'artax/query-results.html', {'page_obj': page_obj})
 
 
 @login_required(login_url="login")
@@ -442,7 +461,7 @@ def show_book(request, book_id):
         book_record.publishing_date = request.POST.get("publishing_date")
         book_record.isbn = request.POST.get("isbn")
         book_record.number_of_copies = request.POST.get("numberOfCopies")
-        book_record.last_edit_time = datetime.datetime.now()
+        book_record.last_edit_time = datetime.now()
         book_record.last_editor = request.user
         book_record.save()
     return render(request, "artax/record-book.html", {"book": book_record, "types": types, "locations": locations,
@@ -493,7 +512,7 @@ def all_files(request):
     files = File.objects.all()
     if request.GET.get("asc") == 'False':
         files = files[::-1]
-    paginator = Paginator(files, PER_PAGE)
+    paginator = Paginator(files, per_page)
     page_obj = paginator.get_page(page_number)
     return render(request, "artax/all-files.html", {"page_obj": page_obj})
 
@@ -564,7 +583,7 @@ def all_clients(request):
     clients = Client.objects.all()
     if request.GET.get("asc") == 'False':
         clients = clients[::-1]
-    paginator = Paginator(clients, PER_PAGE)
+    paginator = Paginator(clients, per_page)
     page_obj = paginator.get_page(page_number)
     return render(request, "artax/all-clients.html", {"page_obj": page_obj})
 
