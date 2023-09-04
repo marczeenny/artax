@@ -15,7 +15,7 @@ urlpatterns = [
     path("artax/under-construction/", views.under_construction, name="under_construction"),
     path("login/", views.login_view, name="login"),
     path("register/", views.new_user, name="register"),
-    path("confirm/<str:uidb64>/<str:token>/", views.confirm_email, name="verify_email"),
+    # path("confirm/<str:uidb64>/<str:token>/", views.confirm_email, name="verify_email"),
     path("profile/", views.profile, name="profile"),
     path("change-password/", views.change_password, name="change_password"),
     path("logout/", views.logout_view, name="logout"),
@@ -24,6 +24,7 @@ urlpatterns = [
     path('books/cover/add/<int:book_id>/', views.change_book_cover, name='change_book_cover'),
     path('books/summary/remove/<int:book_id>/', views.remove_book_summary, name='remove_book_summary'),
     path('books/cover/remove/<int:book_id>/', views.remove_book_cover, name='remove_book_cover'),
+    path('per-page/', views.change_per_page, name="change_per_page"),
     path("books/queries/", views.book_queries, name="book_queries"),
     path("books/", views.all_books, name="all_books"),
     path("books/query-by/", views.query_books_by, name="query_books_by"),
@@ -43,3 +44,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
