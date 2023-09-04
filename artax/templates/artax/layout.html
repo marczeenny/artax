@@ -12,11 +12,9 @@
     <meta content="" name="description">
     <meta content="" name="keywords">
 
-    <!-- Favicons -->
     <link href="{% static 'artax/img/favicon.png' %}" rel="icon">
     <link href="{% static 'artax/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
-    <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
           rel="stylesheet">
@@ -141,7 +139,7 @@
         {% nav_link 'new_book' 'New Book' 'journal-plus' %}
         {% nav_link 'book_queries' 'Query Books ' 'search' %}
 
-
+        <hr>
         <li class="nav-heading">Users</li>
         <!-- End Profile Page Nav -->
 
@@ -156,34 +154,24 @@
         {% endif %}
 
         {% nav_link 'blank' 'Blank Page' 'file-earmark-arrow-up' %}
-        <hr>
-        <li class="nav-heading">UNDER CONSTRUCTION</li>
-        <li class="nav-heading">Clients</li>
-        {% nav_link 'all_clients' 'Clients' 'people' %}
-        {% nav_link 'new_client' 'New Client' 'person-plus' %}
-        {% nav_link 'under_construction' 'Query Clients' 'search' %}
 
-        <li class="nav-heading">Files</li>
-        {% nav_link 'all_files' 'Files ' 'file-earmark-text' %}
-        {% nav_link 'new_file' 'New File' 'file-earmark-plus' %}
-        {% nav_link 'file_queries' 'Query Files ' 'search' %}
+{#        <li class="nav-heading">UNDER CONSTRUCTION</li>#}
+{#        <li class="nav-heading">Clients</li>#}
+{#        {% nav_link 'all_clients' 'Clients' 'people' %}#}
+{#        {% nav_link 'new_client' 'New Client' 'person-plus' %}#}
+{#        {% nav_link 'under_construction' 'Query Clients' 'search' %}#}
+{##}
+{#        <li class="nav-heading">Files</li>#}
+{#        {% nav_link 'all_files' 'Files ' 'file-earmark-text' %}#}
+{#        {% nav_link 'new_file' 'New File' 'file-earmark-plus' %}#}
+{#        {% nav_link 'file_queries' 'Query Files ' 'search' %}#}
 
     </ul>
 
 </aside><!-- End Sidebar-->
 {% endblock%}
 {% block content %}{% endblock %}
-{% block footer %}
-<footer id="footer" class="footer">
-    <div class="copyright">
-        &copy; Copyright <strong><span>ARTAX</span></strong>. All Rights Reserved
-    </div>
-</footer><!-- End Footer -->
 
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-        class="bi bi-arrow-up-short"></i></a>
-
-<!-- Vendor JS Matters -->
 
 <script src="{% static 'artax/vendor/apexcharts/apexcharts.min.js' %}"></script>
 <script src="{% static 'artax/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -194,10 +182,22 @@
 <script src="{% static 'artax/vendor/tinymce/tinymce.min.js' %}"></script>
 <script src="{% static 'artax/vendor/php-email-form/validate.js' %}"></script>
 
-<!-- Template Main JS File -->
 <script src="{% static 'artax/js/main.js' %}"></script>
 
-<div class="loading-animation"></div>
+
+{% block footer %}
+<footer id="footer" class="footer">
+    <div class="copyright">
+        &copy; Copyright <strong><span>ARTAX</span></strong>. All Rights Reserved
+    </div>
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
+
+
+
+
 </body>
 </html>
 {% endblock %}
